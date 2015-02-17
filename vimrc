@@ -1,7 +1,7 @@
 " vim: fdm=marker ts=2 sts=2 sw=2 fdl=0
 
-source ~/.vim/utilities/func.vim
-source ~/.vim/utilities/type.vim
+source ~/.vim/config/func.vim
+source ~/.vim/config/type.vim
 
 
 if !1 | finish | endif
@@ -15,8 +15,8 @@ endif
 
 call neobundle#begin(expand('~/.vim/bundle/'))
 
-source ~/.vim/utilities/set.vim
-source ~/.vim/utilities/bundle.vim
+source ~/.vim/config/set.vim
+source ~/.vim/config/bundle.vim
 
 " window killer
 nnoremap <silent> Q :call CloseWindowOrKillBuffer()<cr>
