@@ -1,7 +1,5 @@
 " vim: fdm=marker ts=2 sts=2 sw=2 fdl=0
 
-NeoBundleFetch 'Shougo/neobundle.vim'
-
 NeoBundle 'Shougo/vimproc.vim', {
   \ 'build': {
     \ 'mac': 'make -f make_mac.mak',
@@ -33,10 +31,12 @@ endif
 let g:airline_section_b = '%{airline#util#wrap(airline#extensions#branch#get_head(),0)}'
 let g:airline_section_c = '%t'
 
-let g:airline_theme = 'solarized2'
+let g:airline_theme = 'solarized'
 
 let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#show_buffers = 0
+let g:airline#extensions#tabline#show_buffers = 1
+let g:airline#extensions#tabline#buffer_nr_show = 1
+let g:airline#extensions#tabline#buffer_nr_format = '%s '
 let g:airline#extensions#tabline#tab_nr_type = 1
 let g:airline#extensions#tabline#fnamemod = ':t'
 let g:airline#extensions#tabline#left_sep = '⮀'
@@ -395,22 +395,7 @@ NeoBundle 'chrisbra/vim_faq'
 NeoBundle 'vimwiki'
 NeoBundle 'bufkill.vim'
 
-NeoBundle 'scrooloose/syntastic'
-let g:syntastic_check_on_open=1
-let g:syntastic_auto_jump=1
-let g:syntastic_python_checkers=['flake8']
-let g:syntastic_mode_map = {
-            \ 'passive_filetypes': ['html']
-            \}
-let g:syntastic_error_symbol = '✗'
-let g:syntastic_style_error_symbol = '✠'
-let g:syntastic_warning_symbol = '∆'
-let g:syntastic_style_warning_symbol = '≈'
-
-let g:syntastic_cpp_check_header = 1
-let g:syntastic_cpp_compiler = 'clang++'
-let g:syntastic_cpp_compiler_options = ' -std=c++11 -stdlib=libc++'
-
+NeoBundle 'maralla/vim-fixup'
 NeoBundleLazy 'mattn/gist-vim', { 'depends': 'mattn/webapi-vim', 'autoload': { 'commands': 'Gist' } }
 let g:gist_post_private=1
 let g:gist_show_privates=1

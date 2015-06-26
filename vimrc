@@ -4,16 +4,19 @@ source ~/.vim/config/func.vim
 source ~/.vim/config/type.vim
 
 
-if !1 | finish | endif
-
+if 0 | endif
 
 if has('vim_starting')
-  set nocompatible
-  set all& "reset everything to their defaults
-  set rtp+=~/.vim/bundle/neobundle.vim
+  if &compatible
+    set nocompatible
+  endif
+
+  set runtimepath+=~/.vim/bundle/neobundle.vim
 endif
 
 call neobundle#begin(expand('~/.vim/bundle/'))
+
+NeoBundleFetch 'Shougo/neobundle.vim'
 
 source ~/.vim/config/set.vim
 source ~/.vim/config/bundle.vim
@@ -28,7 +31,11 @@ endif
 call neobundle#end()
 
 
-colorscheme solarized
+try
+  colorscheme solarized
+catch /^Vim\%((\a\+)\)\=:E185
+endtry
+
 set t_Co=256
 set background=dark
 " hi! StatusLineNC cterm=none
@@ -37,3 +44,7 @@ filetype plugin indent on
 syntax enable
 
 NeoBundleCheck
+
+
+" highlight
+hi SignColumn ctermbg=235
