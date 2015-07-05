@@ -151,17 +151,22 @@ map <leader>pp :set invpaste<CR>:set paste?<CR>
 nmap <silent> <leader>,/ :nohlsearch<CR>
 cmap w!! w !sudo tee % >/dev/null
 
+" buffer
+nnoremap <S-H> :bprev<CR>
+nnoremap <S-L> :bnext<CR>
+
+" tab
 map <leader>tn :tabnew<CR>
 map <leader>tc :tabclose<CR>
-nnoremap <S-H> :tabprev<CR>
-nnoremap <S-L> :tabnext<CR>
+nnoremap <left> :tabprev<CR>
+nnoremap <right> :tabnext<CR>
 nnoremap <down> :tabprev<CR>
-nnoremap <left> :bprev<CR>
-nnoremap <right> :bnext<CR>
 nnoremap <up> :tabnext<CR>
+
 nnoremap <leader>v <C-w>v<C-w>l
 nnoremap <leader>s <C-w>s
 nnoremap <leader>vsa :vert sba<cr>
+
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
@@ -235,6 +240,11 @@ nnoremap <silent> <leader>DD :exe ":profile start profile.log"<cr>:exe ":profile
 nnoremap <silent> <leader>DP :exe ":profile pause"<cr>
 nnoremap <silent> <leader>DC :exe ":profile continue"<cr>
 nnoremap <silent> <leader>DQ :exe ":profile pause"<cr>:noautocmd qall!<cr>
+
+
+" cscope
+nmap <leader>cg :cscope find g <C-R>=expand("<cword>")<CR><CR>
+nmap <leader>cs :cscope find s <C-R>=expand("<cword>")<CR><CR>
 
 command! -bang Q q<bang>
 command! -bang QA qa<bang>

@@ -9,7 +9,7 @@ NeoBundle 'Shougo/vimproc.vim', {
   \ },
 \ }
 
-
+NeoBundle 'maralla/mycolor'
 NeoBundle 'bling/vim-airline'
 let g:airline_left_sep = '⮀'
 let g:airline_left_alt_sep = '⮁'
@@ -31,12 +31,13 @@ endif
 let g:airline_section_b = '%{airline#util#wrap(airline#extensions#branch#get_head(),0)}'
 let g:airline_section_c = '%t'
 
-let g:airline_theme = 'solarized'
+let g:airline_theme = 'myairline'
 
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#show_buffers = 1
 let g:airline#extensions#tabline#buffer_nr_show = 1
 let g:airline#extensions#tabline#buffer_nr_format = '%s '
+let g:airline#extensions#tabline#buffer_min_count = 2
 let g:airline#extensions#tabline#tab_nr_type = 1
 let g:airline#extensions#tabline#fnamemod = ':t'
 let g:airline#extensions#tabline#left_sep = '⮀'
@@ -106,6 +107,21 @@ NeoBundleLazy 'maralla/vim-gocode', {
       \ 'autoload': {'filetypes': ['go']},
       \ 'build': {'mac': 'make', 'unix': 'make'}
       \ }
+
+
+" rustlang
+NeoBundle 'rust-lang/rust.vim'
+NeoBundleLazy 'phildawes/racer', {
+      \ 'autoload': {'filetypes': ['rust']},
+      \ 'build' : {
+      \   'mac': 'cargo build --release',
+      \     'unix': 'cargo build --release',
+      \   }
+      \ }
+let g:racer_cmd = '~/.vim/bundle/racer/target/release/racer'
+let $RUST_SRC_PATH = '/Users/maralla/Workspace/src/rust/src'
+
+NeoBundle 'maralla/vim-toml-enhance', {'depends': 'cespare/vim-toml'}
 
 
 " scm
