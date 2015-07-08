@@ -1,8 +1,7 @@
 " vim: fdm=marker ts=2 sts=2 sw=2 fdl=0
-
 source ~/.vim/config/func.vim
 source ~/.vim/config/type.vim
-
+source ~/.vim/config/set.vim
 
 if 0 | endif
 
@@ -18,7 +17,6 @@ call neobundle#begin(expand('~/.vim/bundle/'))
 
 NeoBundleFetch 'Shougo/neobundle.vim'
 
-source ~/.vim/config/set.vim
 source ~/.vim/config/bundle.vim
 
 " window killer
@@ -30,7 +28,7 @@ endif
 
 call neobundle#end()
 
-
+let g:solarized_termcolors=256
 try
   colorscheme solarized
 catch /^Vim\%((\a\+)\)\=:E185
@@ -38,13 +36,14 @@ endtry
 
 set t_Co=256
 set background=dark
-" hi! StatusLineNC cterm=none
 
 filetype plugin indent on
 syntax enable
 
 NeoBundleCheck
 
+" load bundle settings
+source ~/.vim/config/settings.vim
 
-" highlight
+" highlights
 hi SignColumn ctermbg=235
