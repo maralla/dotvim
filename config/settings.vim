@@ -1,4 +1,13 @@
 " airline
+let airline = neobundle#get("vim-airline")
+function! airline.hooks.on_source(airline)
+  if $TERM == 'screen' && $TMUX != ''
+    function! AirlineSetup()
+      let g:airline_section_z = airline#section#create_right(['%3p%% ⭡ %4l:%3c ', 'Tmux'])
+    endfunction
+    autocmd VimEnter * call AirlineSetup()
+  endif
+endfunction
 let g:airline_left_sep = '⮀'
 let g:airline_left_alt_sep = '⮁'
 let g:airline_right_sep = '⮂'
@@ -8,12 +17,6 @@ let g:airline_symbols.space = ' '
 let g:airline_symbols.linenr = "\u2b61"
 let g:airline_symbols.branch = "\uf020"
 let g:airline_symbols.readonly = '⭤'
-if $TERM == 'screen' && $TMUX != ''
-  function! AirlineSetup()
-    let g:airline_section_z = airline#section#create_right(['%3p%% ⭡ %4l:%3c ', 'Tmux'])
-  endfunction
-  autocmd VimEnter * call AirlineSetup()
-endif
 let g:airline_section_b = '%{airline#util#wrap(airline#extensions#branch#get_head(),0)}'
 let g:airline_section_c = '%t'
 let g:airline_theme = 'myairline'
@@ -218,7 +221,8 @@ function! bundle.hooks.on_source(bundle)
         \ 'node_modules/',
         \ '*\.min\.\(js\|css\)$',
         \ '\.egg-info',
-        \ '\.tox'
+        \ '\.tox',
+        \ 'target'
         \ ], '\|'))
 endfunction
 
@@ -307,10 +311,13 @@ endif
 
 
 " maralla/vim-fixup
-function s:fixup_setup()
-  let g:airline_section_warning = airline#section#create(['fixup'])
+let fixup = neobundle#get("vim-fixup")
+function! fixup.hooks.on_source(fixup)
+  function s:fixup_setup()
+    let g:airline_section_warning = airline#section#create(['fixup'])
+  endfunction
+  autocmd VimEnter * call s:fixup_setup()
 endfunction
-autocmd VimEnter * call s:fixup_setup()
 
 
 " mattn/gist-vim

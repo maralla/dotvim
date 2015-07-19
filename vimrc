@@ -26,6 +26,8 @@ if neobundle#is_sourced('vim-dispatch')
   nnoremap <leader>tag :Dispatch ctags -R<cr>
 endif
 
+source ~/.vim/config/settings.vim
+
 call neobundle#end()
 
 let g:solarized_termcolors=256
@@ -41,9 +43,6 @@ filetype plugin indent on
 syntax enable
 
 NeoBundleCheck
-
-" load bundle settings
-source ~/.vim/config/settings.vim
 
 " highlights
 hi SignColumn ctermbg=235

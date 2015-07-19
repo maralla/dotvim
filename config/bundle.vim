@@ -76,7 +76,7 @@ NeoBundleLazy 'phildawes/racer', {
 NeoBundle 'maralla/vim-toml-enhance', {'depends': 'cespare/vim-toml'}
 
 " c/c++
-NeoBundleLazy 'justinmk/vim-syntax-extra', {'autoload': {'filetypes': ['c', 'cpp']}}
+NeoBundleLazy 'justinmk/vim-syntax-extra', {'autoload': {'filetypes': ['c', 'cpp', 'yacc', 'flex', 'lex']}}
 
 
 " scm
