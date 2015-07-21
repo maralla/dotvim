@@ -328,3 +328,7 @@ let g:gist_show_privates=1
 " altercation/vim-colors-solarized
 " let g:solarized_termcolors=256
 " let g:solarized_termtrans=1
+
+
+" hdima/python-syntax
+let python_highlight_all = 1

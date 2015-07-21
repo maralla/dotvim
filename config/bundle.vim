@@ -54,6 +54,7 @@ NeoBundleLazy 'kchmck/vim-coffee-script', {'autoload': {'filetypes':['coffee']}}
 NeoBundleLazy 'hynek/vim-python-pep8-indent', {'autoload': {'filetypes': ['python']}}
 NeoBundleLazy 'Glench/Vim-Jinja2-Syntax', {'autoload': {'filetypes': ['jinja', 'html']}}
 NeoBundleLazy 'tshirtman/vim-cython', {'autoload': {'filetypes': ['cython']}}
+NeoBundleLazy 'hdima/python-syntax', {'autoload': {'filetypes': ['python']}}
 
 
 " golang
