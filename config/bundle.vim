@@ -129,9 +129,7 @@ NeoBundleLazy 'mbbill/undotree', {'autoload':{'commands':'UndotreeToggle'}}
 NeoBundleLazy 'EasyGrep', {'autoload':{'commands':'GrepOptions'}}
 NeoBundle 'Shougo/vimfiler.vim'
 NeoBundleLazy 'scrooloose/nerdtree', {'autoload':{'commands':['NERDTreeToggle','NERDTreeFind']}}
-
-" NeoBundleLazy 'majutsushi/tagbar', {'autoload':{'commands':'TagbarToggle'}}
-" nnoremap <silent> <leader>t :TagbarToggle<CR>
+NeoBundleLazy 'majutsushi/tagbar', {'autoload':{'commands':'Tagbar'}}
 
 NeoBundle 'Shougo/unite.vim'
 NeoBundleLazy 'Shougo/neomru.vim', {'autoload':{'unite_sources':'file_mru'}}
