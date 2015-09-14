@@ -55,6 +55,7 @@ NeoBundleLazy 'hynek/vim-python-pep8-indent', {'autoload': {'filetypes': ['pytho
 NeoBundleLazy 'Glench/Vim-Jinja2-Syntax', {'autoload': {'filetypes': ['jinja', 'html']}}
 NeoBundleLazy 'tshirtman/vim-cython', {'autoload': {'filetypes': ['cython']}}
 NeoBundleLazy 'hdima/python-syntax', {'autoload': {'filetypes': ['python']}}
+NeoBundleLazy 'maralla/rope.vim', {'autoload': {'filetypes': ['python']}}
 
 
 " golang
@@ -124,12 +125,13 @@ NeoBundle 'justinmk/vim-sneak'
 
 " navigation
 NeoBundle 'Lokaltog/vim-easymotion'
-NeoBundle 'mileszs/ack.vim'
+" NeoBundle 'mileszs/ack.vim'
 NeoBundleLazy 'mbbill/undotree', {'autoload':{'commands':'UndotreeToggle'}}
 NeoBundleLazy 'EasyGrep', {'autoload':{'commands':'GrepOptions'}}
 NeoBundle 'Shougo/vimfiler.vim'
 NeoBundleLazy 'scrooloose/nerdtree', {'autoload':{'commands':['NERDTreeToggle','NERDTreeFind']}}
-NeoBundleLazy 'majutsushi/tagbar', {'autoload':{'commands':'Tagbar'}}
+NeoBundle 'majutsushi/tagbar'
+NeoBundle 'wincent/ferret'
 
 NeoBundle 'Shougo/unite.vim'
 NeoBundleLazy 'Shougo/neomru.vim', {'autoload':{'unite_sources':'file_mru'}}
@@ -168,7 +170,7 @@ NeoBundleLazy 'guns/xterm-color-table.vim', {'autoload':{'commands':'XtermColorT
 NeoBundle 'chrisbra/vim_faq'
 NeoBundle 'vimwiki'
 NeoBundle 'bufkill.vim'
-NeoBundle 'maralla/vim-fixup'
+NeoBundle 'maralla/vim-linter'
 NeoBundleLazy 'mattn/gist-vim', { 'depends': 'mattn/webapi-vim', 'autoload': { 'commands': 'Gist' } }
 NeoBundle 'ryanss/vim-hackernews'
 

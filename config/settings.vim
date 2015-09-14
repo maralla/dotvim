@@ -29,6 +29,7 @@ let g:airline#extensions#tabline#tab_nr_type = 1
 let g:airline#extensions#tabline#fnamemod = ':t'
 let g:airline#extensions#tabline#left_sep = '⮀'
 let g:airline#extensions#tabline#left_alt_sep = '⮁'
+let g:airline#extensions#tagbar#enabled = 1
 
 
 " tpope/vim-unimpaired
@@ -188,7 +189,8 @@ let NERDTreeChDirMode=2
 let NERDTreeShowBookmarks=1
 let NERDTreeDirArrows = 1
 let NERDTreeIgnore=['\.pyc', '__pycache__', 'egg-info', '\~$', '\.swo$',
-            \'\.swp$', '\.git', '\.hg', '\.svn', '\.bzr', '\.DS_Store']
+            \'\.swp$', '\.git', '\.hg', '\.svn', '\.bzr', '\.DS_Store', '\.o',
+            \'\.ropeproject']
 let NERDTreeBookmarksFile='~/.vim/.cache/NERDTreeBookmarks'
 nnoremap <C-N> :NERDTreeToggle<CR>
 nnoremap <Leader>e :NERDTreeFind<CR>
@@ -310,14 +312,15 @@ if !has('gui_running')
 endif
 
 
-" maralla/vim-fixup
-let fixup = neobundle#get("vim-fixup")
-function! fixup.hooks.on_source(fixup)
-  function s:fixup_setup()
-    let g:airline_section_warning = airline#section#create(['fixup'])
+" maralla/vim-linter
+let linter = neobundle#get("vim-linter")
+function! linter.hooks.on_source(linter)
+  function s:linter_setup()
+    let g:airline_section_warning = airline#section#create(['linter'])
   endfunction
-  autocmd VimEnter * call s:fixup_setup()
+  autocmd VimEnter * call s:linter_setup()
 endfunction
+let g:linter_debug = 1
 
 
 " mattn/gist-vim
@@ -332,3 +335,7 @@ let g:gist_show_privates=1
 
 " hdima/python-syntax
 let python_highlight_all = 1
+
+
+" ropevim
+let ropevim_vim_completion=1
