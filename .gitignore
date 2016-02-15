@@ -1,4 +1,2 @@
-bundle
-!bundle/neobundle.vim
 .cache
 .netrwhist
