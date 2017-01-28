@@ -1,1 +1,1 @@
-maralla's personal vim config
+Personal vim config.
