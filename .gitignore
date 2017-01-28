@@ -1,2 +1,6 @@
 .cache
 .netrwhist
+plugin/__pack.vim
+doc/tags
+pack/*
+!pack/.gitkeep
