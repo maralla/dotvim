@@ -1,6 +1,7 @@
 .cache
 .netrwhist
 plugin/__pack.vim
+plugin/_pack.vim
 doc/tags
 pack/*
 !pack/.gitkeep
