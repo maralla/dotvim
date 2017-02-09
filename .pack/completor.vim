@@ -15,4 +15,3 @@ let g:completor_tex_omni_trigger = '\\\\(:?'
         \ . '|includepdf(\s*\[[^]]*\])?\s*\{[^}]*'
         \ . '|includestandalone(\s*\[[^]]*\])?\s*\{[^}]*'
         \ .')$'
-
