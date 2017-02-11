@@ -154,16 +154,6 @@
   name: "jiangmiao/auto-pairs"
   opt: false
 - 
-  category: default
-  local: false
-  name: "junegunn/vim-oblique"
-  opt: false
-- 
-  category: default
-  local: false
-  name: "junegunn/vim-pseudocl"
-  opt: false
-- 
   category: lang
   local: false
   name: "justinmk/vim-syntax-extra"

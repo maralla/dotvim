@@ -61,7 +61,7 @@ function! LightLineFiletype()
 endfunction
 
 function! LightLineLineinfo()
-  let msg = printf("%-4d:%-3d", line('.'), col('.'))
+  let msg = printf('%-4d:%-3d', line('.'), col('.'))
   return winwidth(0) > 70 ? "\ue0a1 ".msg : ''
   " return winwidth(0) > 70 ? '⭡ '.msg : ''
 endfunction
