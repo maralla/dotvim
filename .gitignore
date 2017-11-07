@@ -5,3 +5,4 @@ plugin/_pack.vim
 doc/tags
 pack/*
 !pack/.gitkeep
+.DS_Store

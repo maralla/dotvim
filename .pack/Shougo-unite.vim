@@ -6,12 +6,10 @@ let g:unite_source_rec_max_cache_files=5000
 let g:unite_prompt='» '
 
 let g:unite_source_grep_command = 'rg'
-let g:unite_source_grep_default_opts = '--vimgrep'
+let g:unite_source_grep_default_opts = '--vimgrep --no-ignore-vcs'
 
 function! s:unite_settings()
   nmap <buffer> Q <plug>(unite_exit)
-  nmap <buffer> <esc> <plug>(unite_exit)
-  imap <buffer> <esc> <plug>(unite_exit)
   nmap <silent><buffer><expr> gs unite#do_action('vsplit')
   nmap <silent><buffer><expr> s unite#do_action('split')
 endfunction
@@ -26,7 +24,7 @@ nnoremap <silent> [unite]f :<C-u>call <SID>f()<cr><c-u>
 " nnoremap <silent> [unite]y :<C-u>Unite -buffer-name=yanks history/yank<cr>
 " nnoremap <silent> [unite]l :<C-u>Unite -auto-resize -buffer-name=line line<cr>
 " nnoremap <silent> [unite]b :<C-u>Unite -auto-resize -buffer-name=buffers buffer<cr>
-" nnoremap <silent> [unite]/ :<C-u>Unite -no-quit -buffer-name=search grep:.<cr>
+nnoremap <silent> [unite]/ :<C-u>Unite -no-quit -buffer-name=search grep:.<cr>
 " nnoremap <silent> [unite]m :<C-u>Unite -auto-resize -buffer-name=mappings mapping<cr>
 " nnoremap <silent> [unite]s :<C-u>Unite -quick-match buffer<cr>
 
@@ -59,7 +57,10 @@ function! s:setup()
           \ '\.egg-info',
           \ '\.tox',
           \ 'target',
-          \ '\.cache'
+          \ 'dist',
+          \ '\.venv',
+          \ '\.cache',
+          \ '\.ropeproject'
           \ ], '\|'))
   endif
   let s:setted = v:true

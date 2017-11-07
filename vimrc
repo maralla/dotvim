@@ -163,13 +163,6 @@ nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
 
-inoremap jk <esc>
-inoremap kj <esc>
-
-nnoremap q: q:i
-nnoremap q/ q/i
-nnoremap q? q?i
-
 nnoremap zr zr:echo &foldlevel<cr>
 nnoremap zm zm:echo &foldlevel<cr>
 nnoremap zR zR:echo &foldlevel<cr>
@@ -228,7 +221,7 @@ autocmd BufReadPost *
 "netrw
 let g:netrw_liststyle = 3
 let g:netrw_banner = 0
-let g:netrw_list_hide= netrw_gitignore#Hide().',.*\.swp$'
+let g:netrw_list_hide= '__pycache__,.*\.pyc$,.*\.swp,\.git,\.ropeproject,\.cache,build,\.egg-info,dist'
 
 " cscope {{{
 let g:cscope_db_added = 0
@@ -271,7 +264,7 @@ endfunction
 
 function CreateCscopeDB()
   if has("cscope")
-    silent call system("find . -iname *.c -o -iname *.h > .cscope.files")
+    silent call system("find . -iname *.c -o -iname *.h -o -iname *.cpp > .cscope.files")
     silent call system("cscope -b -i .cscope.files -f .cscope.out")
     silent :cs reset
     redraw!
@@ -284,8 +277,8 @@ function UpdateCscopeDB()
   endif
 endfunction
 
-autocmd BufNewFile,BufRead *.c,*.h call SetupCscope()
-autocmd BufNewFile,BufWritePost *.c,*.h call UpdateCscopeDB()
+autocmd BufNewFile,BufRead *.c,*.h,*.cpp call SetupCscope()
+autocmd BufNewFile,BufWritePost *.c,*.h,*.cpp call UpdateCscopeDB()
 nmap <leader><leader>s :call CreateCscopeDB()<CR>
 
 "}}}

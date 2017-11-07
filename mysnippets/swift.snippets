@@ -1,0 +1,271 @@
+# Imports
+
+snippet imp "Import (imp)"
+import ${1:Foundation}
+endsnippet
+
+# Var/Let
+
+snippet let "Let (let)"
+let ${1}: ${2}
+endsnippet
+
+snippet var "Variable (var)"
+var ${1}: ${2}
+endsnippet
+
+snippet ovar "Optional Variable (ovar)"
+var ${1}: ${2}?
+endsnippet
+
+snippet ivar "Implicitly-Unwrapped Variable (ivar)"
+var ${1}: ${2}!
+endsnippet
+
+# String Interpolation
+
+snippet sint "String Interpolation (sint)"
+"\(${1})"
+endsnippet
+
+# Control Statements
+
+snippet forin "For-In Loop (forin)"
+for ${1:index} in ${2}...${3} {
+    ${4}
+}
+endsnippet
+
+snippet while "While Loop (while)"
+while ${1} {
+    ${2}
+}
+endsnippet
+
+snippet repeat "Repeat-While Loop (repeat)"
+repeat {
+    ${1}
+} while ${2}
+endsnippet
+
+snippet if "If (if)"
+if ${1} {
+    ${2}
+}
+endsnippet
+
+snippet switch "Switch (switch)"
+switch ${1} {
+    case ${2}:
+        ${3}
+    default:
+        ${4:break}
+}
+endsnippet
+
+snippet switch-let "Switch-Let (switchlet)"
+switch ${1} {
+    case let ${2}(${3}):
+        ${4:break}
+    default:
+        ${5:break}
+}
+endsnippet
+
+snippet br "Break (br)"
+break
+endsnippet
+
+snippet cont "Continue (cont)"
+continue
+endsnippet
+
+snippet ret "Return (ret)"
+return ${1}
+endsnippet
+
+snippet guard "Guard (guard)"
+guard ${1} else { ${2:fatalError()} }
+endsnippet
+
+snippet guardl "Guard-Let (guardl)"
+guard let ${1} = ${2} else { ${3:fatalError()} }
+endsnippet
+
+snippet guarda "Guard-As? (guarda)"
+guard let ${1} = ${2} as? ${3} else { ${4:fatalError()} }
+endsnippet
+
+# Functions
+
+snippet func "Function (func)"
+func ${1}(${2}) ${3:-> ()} {
+    ${4}
+}
+endsnippet
+
+snippet func1 "1-Argument Function (func1)"
+func ${1}(${2}: ${3}) ${4:-> ()} {
+    ${5}
+}
+endsnippet
+
+snippet func2 "2-Argument Function (func2)"
+func ${1}(${2}: ${3}, ${4}: ${5}) ${6:-> ()} {
+    ${7}
+}
+endsnippet
+
+# Closures
+
+snippet clo "Closure (clo)"
+{ (${1}) -> ${2:()} in
+    ${3}
+}
+endsnippet
+
+# Enumerations
+
+snippet enum "Enumeration (enum)"
+enum ${1} {
+    case ${2}
+}
+endsnippet
+
+snippet ienum "Int Enumeration (ienum)"
+enum ${1}: Int {
+    case ${2}
+}
+endsnippet
+
+snippet senum "String Enumeration (senum)"
+enum ${1}: String {
+    case ${2}
+}
+endsnippet
+
+# Classes and Structures
+
+snippet class "Class (class)"
+class ${1} {
+    ${2}
+}
+endsnippet
+
+snippet nsclass "NSObject Subclass (nsclass)"
+class ${1}: NSObject {
+    ${2}
+}
+endsnippet
+
+snippet struct "Struct (struct)"
+struct ${1} {
+    ${2}
+}
+endsnippet
+
+# Properties
+
+snippet lazy "Lazy Variable (lazy)"
+lazy var ${1}: ${2} = {
+    ${3}
+}()
+endsnippet
+
+snippet computed "Computed Variable (compute)"
+var ${1}: ${2} {
+    return ${3}
+}
+endsnippet
+
+# Methods
+
+snippet mutating "Mutating Function (mutating)"
+mutating func ${1}(${2}) ${3:-> ()} {
+    ${4}
+}
+endsnippet
+
+# Subscripts
+
+snippet subs "Subscript Definition (subs)"
+subscript(index: Int) -> ${1:()} {
+    get {
+        ${2}
+    }
+    set(${3:newValue}) {
+        ${4}
+    }
+}
+endsnippet
+
+# Inheritance
+
+snippet subc "Subclass (subc)"
+class ${1}: ${2} {
+    ${3}
+}
+endsnippet
+
+snippet over "Override (over)"
+override ${1}
+endsnippet
+
+# Initialization
+
+snippet init "init() (init)"
+init() {
+    ${1}
+}
+endsnippet
+
+snippet inits "init() with call to super (inits)"
+init() {
+    ${1}
+    super.init()
+}
+endsnippet
+
+snippet deinit "deinit() (deinit)"
+deinit {
+    ${1}
+}
+endsnippet
+
+# Error Handling
+
+snippet do "do-try-catch (do)"
+do {
+    try ${1:statement}
+} catch ${2:patterns} {
+    ${3:statements}
+}
+endsnippet
+
+# Extensions
+
+snippet ext "Extension (ext)"
+extension ${1}: ${2} {
+    ${3}
+}
+endsnippet
+
+# Protocols
+
+snippet proto "Protocol (proto)"
+protocol ${1} {
+    ${2}
+}
+endsnippet
+
+# Interface Builder
+
+snippet ibo "@IBOutlet (ibo)"
+@IBOutlet weak var ${1}: ${2}?
+endsnippet
+
+snippet iba "@IBAction (iba)"
+@IBAction func ${1}(sender: ${2}) {
+    ${3}
+}
+endsnippet

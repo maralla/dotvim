@@ -75,7 +75,7 @@ function! LightLineTmux()
     return ''
   endif
 
-  return $TERM == 'screen' && $TMUX != '' ? 'Tmux' : ''
+  return $TERM ==? 'screen' && $TMUX !=? '' ? 'Tmux' : ''
 endfunction
 
 function! LightLineValidator()
