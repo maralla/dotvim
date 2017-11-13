@@ -62,11 +62,6 @@
 - 
   category: lang
   local: false
-  name: "ap/vim-css-color"
-  opt: false
-- 
-  category: lang
-  local: false
   name: "cakebaker/scss-syntax.vim"
   opt: false
 - 
@@ -154,11 +149,6 @@
   name: "hynek/vim-python-pep8-indent"
   opt: false
 - 
-  category: base
-  local: false
-  name: itchyny/lightline.vim
-  opt: false
-- 
   category: default
   local: false
   name: "jiangmiao/auto-pairs"
@@ -188,6 +178,11 @@
   local: false
   name: "leafgarland/typescript-vim"
   opt: false
+- 
+  category: themes
+  local: false
+  name: "lifepillar/vim-solarized8"
+  opt: true
 - 
   category: default
   local: false

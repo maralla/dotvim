@@ -1,11 +1,14 @@
 " vim: fdm=marker ts=2 sts=2 sw=2 fdl=0
 
+set encoding=utf-8
+scriptencoding utf-8
+
 " utils {{{
 function! Preserve(command)
   " preparation: save last search, and cursor position.
   let _s=@/
-  let l = line(".")
-  let c = col(".")
+  let l = line('.')
+  let c = col('.')
   " do the business:
   execute a:command
   " clean up: restore previous search history, and cursor position
@@ -24,19 +27,18 @@ function! EnsureExists(path)
 endfunction
 " }}}
 
-" types {{{
-autocmd BufNewFile,BufRead *.h setfiletype c
-autocmd FileType css,less,javascript,json,html,php,puppet,yaml,jinja,vim setlocal shiftwidth=2 tabstop=2 softtabstop=2
-" }}}
-
 if 0 | endif
 
 filetype plugin indent on
 syntax enable
 
 " settings {{{
-set t_Co=256
-set background=dark
+" set t_Co=256
+" set background=dark
+set termguicolors
+let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+colorscheme solarized8_dark
 
 set timeoutlen=300                              " mapping timeout
 set ttimeoutlen=50                              " keycode timeout
@@ -44,7 +46,6 @@ set mousehide                                   " hide when characters are typed
 set history=1000                                " number of command lines to remember
 set ttyfast                                     " assume fast terminal connection
 set viewoptions=folds,options,cursor,unix,slash " unix/windows compatibility
-set encoding=utf-8                              " set encoding for text
 set clipboard=unnamed                           " sync with OS clipboard
 set hidden                                      " allow buffer switching without saving
 set autoread                                    " auto reload if file saved externally
@@ -99,10 +100,19 @@ set incsearch  " incremental searching
 set ignorecase " ignore case for searching
 set smartcase  " do case-sensitive if there's a capital letter
 
-set cursorline
-autocmd WinLeave * setlocal nocursorline
-autocmd WinEnter * setlocal cursorline
 set colorcolumn=80
+set cursorline
+
+" Autocmds.
+augroup myvimrc
+  autocmd BufNewFile,BufRead *.h setfiletype c
+  autocmd FileType css,less,javascript,json,html,php,puppet,yaml,jinja,vim setlocal shiftwidth=2 tabstop=2 softtabstop=2
+  autocmd BufReadPost *
+    \ if line("'\"") > 0 && line("'\"") <= line("$") |
+    \  exe 'normal! g`"zvzz' |
+    \ endif
+augroup END
+
 
 if has('conceal')
   set conceallevel=1
@@ -136,13 +146,13 @@ else
   let &t_EI = "\<Esc>]50;CursorShape=0\x7"
 endif
 
-let mapleader = ","
-let g:mapleader = ","
+let mapleader = ','
+let g:mapleader = ','
 
 " mappings
 vmap <leader>s :sort<cr>
 nnoremap <leader>w :w<cr>
-map <leader>pp :set invpaste<CR>:set paste?<CR>
+map <leader>pp :set paste!<CR>
 nmap <silent> <leader>,/ :nohlsearch<CR>
 cmap w!! w !sudo tee % >/dev/null
 
@@ -211,11 +221,6 @@ command! -bang Q q<bang>
 command! -bang QA qa<bang>
 command! -bang Qa qa<bang>
 
-autocmd BufReadPost *
-  \ if line("'\"") > 0 && line("'\"") <= line("$") |
-  \  exe 'normal! g`"zvzz' |
-  \ endif
-
 "}}}
 
 "netrw
@@ -225,11 +230,11 @@ let g:netrw_list_hide= '__pycache__,.*\.pyc$,.*\.swp,\.git,\.ropeproject,\.cache
 
 " cscope {{{
 let g:cscope_db_added = 0
-function SetupCscope()
-  if has("cscope")
+function! SetupCscope()
+  if has('cscope')
       set cscopetag
       set csto=0
-      if !g:cscope_db_added && filereadable(".cscope.out")
+      if !g:cscope_db_added && filereadable('.cscope.out')
         let g:cscope_db_added = 1
         cs add .cscope.out
       endif
@@ -262,17 +267,17 @@ function SetupCscope()
   endif
 endfunction
 
-function CreateCscopeDB()
-  if has("cscope")
-    silent call system("find . -iname *.c -o -iname *.h -o -iname *.cpp > .cscope.files")
-    silent call system("cscope -b -i .cscope.files -f .cscope.out")
+function! CreateCscopeDB()
+  if has('cscope')
+    silent call system('find . -iname *.c -o -iname *.h -o -iname *.cpp > .cscope.files')
+    silent call system('cscope -b -i .cscope.files -f .cscope.out')
     silent :cs reset
     redraw!
   endif
 endfunction
 
-function UpdateCscopeDB()
-  if filereadable(".cscope.out")
+function! UpdateCscopeDB()
+  if filereadable('.cscope.out')
     call CreateCscopeDB()
   endif
 endfunction
@@ -280,44 +285,139 @@ endfunction
 autocmd BufNewFile,BufRead *.c,*.h,*.cpp call SetupCscope()
 autocmd BufNewFile,BufWritePost *.c,*.h,*.cpp call UpdateCscopeDB()
 nmap <leader><leader>s :call CreateCscopeDB()<CR>
-
 "}}}
 
-func! RustFmtHandler(chan, msg)
-  let out = split(a:msg, '\r\?\n')
-  if len(out) > 1
-    let errors = []
-    for line in out
-      let tokens = matchlist(line, '^\(.\{-}\):\(\d\+\):\(\d\+\):\s*\(\d\+:\d\+\s*\)\?\s*error: \(.*\)')
-      if !empty(tokens)
-        call add(errors, {"filename": @%,
-                         \"lnum":     tokens[2],
-                         \"col":      tokens[3],
-                         \"text":     tokens[5]})
-      endif
-    endfor
-    if !empty(errors)
-      call setloclist(0, errors, 'r')
-      echohl Error | echomsg "rustfmt returned error" | echohl None
-    endif
-  else
-    let l:curw = winsaveview()
-    try | silent undojoin | catch | endtry
 
-    let l:tmpname = expand("%:p:h") . "/." . expand("%:p:t") . ".rustfmt"
-    " Replace current file with temp file, then reload buffer
-    call rename(l:tmpname, expand('%'))
-    silent edit!
-    let &syntax = &syntax
-    call winrestview(l:curw)
+
+
+" Status line
+let s:min_status_width = 70
+let s:mode_map = {
+      \ 'n':      '  NORMAL ',
+      \ 'no':     '  NO     ',
+      \ 'v':      '  V-CHAR ',
+      \ 'V':      '  V-LINE ',
+      \ 'CTRL-V': '  V-BLOCK',
+      \ 's':      '  S-CHAR ',
+      \ 'S':      '  S-LINE ',
+      \ 'CTRL-S': '  S-BLOCK',
+      \ 'i':      '  INSERT ',
+      \ 'ic':     '  I-COMP ',
+      \ 'ix':     '  I-COMP ',
+      \ 'R':      '  REPLACE',
+      \ 'Rc':     '  R-COMP ',
+      \ 'Rv':     '  R-VIRT ',
+      \ 'Rx':     '  R-COMP ',
+      \ 'c':      '  C-LINE ',
+      \ 'cv':     '  EX     ',
+      \ 'ce':     '  EX     ',
+      \ 'r':      '  ENTER  ',
+      \ 'rm':     '  MORE   ',
+      \ 'r?':     '  CONFIRM',
+      \ '!':      '  SHELL  ',
+      \ }
+
+function! StatusMode()
+  if winwidth(0) <= s:min_status_width
+    return ''
   endif
-endfunc
+  let l:mode = mode()
+  return has_key(s:mode_map, l:mode) ? s:mode_map[l:mode] : ''
+endfunction
 
-function! FormatRust()
-  let l:tmpname = expand("%:p:h") . "/." . expand("%:p:t") . ".rustfmt"
-  call writefile(getline(1, '$'), l:tmpname)
+function! StatusPaste()
+  if winwidth(0) <= s:min_status_width
+    return ''
+  endif
+  return &paste ? ' PASTE ' : ''
+endfunction
 
-  let command = 'rustfmt --write-mode=overwrite '.l:tmpname
+function! StatusBranch()
+  if winwidth(0) <= s:min_status_width || !exists('*fugitive#head')
+    return ''
+  endif
+  let branch = fugitive#head()
+  return empty(branch) ? '' : "   \ue0a0 " . branch
+endfunction
 
-  let g:rustfmt_job = job_start(command, {"callback": "RustFmtHandler"})
-endfunc
+function! StatusFilename()
+  let name = expand('%:t')
+  let name = name !=# '' ? name : '[No Name]'
+  if name =~? 'netrw'
+    return 'netrw'
+  endif
+  let readonly = &readonly ? "\ue0a2 " : ''
+  let modified = &modified ? ' +' : ''
+  return '    '.readonly . name . modified
+endfunction
+
+function! StatusTag()
+  if winwidth(0) <= s:min_status_width || !exists('*tagbar#currenttag')
+    return ''
+  endif
+  let tag = tagbar#currenttag('%s', '', '')
+  return empty(tag) ? '' : tag . '  '
+endfunction
+
+function! StatusFileType()
+  if winwidth(0) <= s:min_status_width
+    return ''
+  endif
+  return empty(&ft) ? '' : &ft . '   '
+endfunction
+
+function! StatusLineInfo()
+  if winwidth(0) <= s:min_status_width
+    return ''
+  endif
+  let msg = printf('%-4d:%-3d', line('.'), col('.'))
+  return " \ue0a1 " . msg
+endfunction
+
+function! StatusTmux()
+  if winwidth(0) <= s:min_status_width
+    return ''
+  endif
+  return $TERM ==? 'screen' && $TMUX !=? '' ? '   @tmux   ' : ''
+endfunction
+
+function! StatusValidator()
+  if winwidth(0) <= s:min_status_width
+    return ''
+  endif
+  return validator#get_status_string()
+endfunction
+
+
+function! s:create_statusline(mode)
+  hi StatusLine            guifg=#212121
+  hi StatusLineNC          guifg=#212121
+  hi StatusActiveMode      guifg=#757575 guibg=#212121
+  hi StatusActivePaste     guifg=#757575 guibg=#212121
+  hi StatusActiveBranch    guifg=#757575 guibg=#212121
+  hi StatusActiveFName     guifg=#757575 guibg=#212121
+  hi StatusActiveTag       guifg=#757575 guibg=#212121
+  hi StatusActiveFType     guifg=#757575 guibg=#212121
+  hi StatusActiveLInfo     guifg=#757575 guibg=#212121
+  hi StatusActiveTmux      guifg=#757575 guibg=#212121
+  hi StatusActiveValidator guifg=#C62828 guibg=#212121
+
+  let parts = [
+        \ '%#Status' .a:mode. 'Mode#%{StatusMode()}',
+        \ '%#Status' .a:mode. 'Paste#%{StatusPaste()}',
+        \ '%#Status' .a:mode. 'Branch#%-{StatusBranch()}',
+        \ '%#Status' .a:mode. 'FName#%{StatusFilename()}',
+        \ '%=',
+        \ '%#Status' .a:mode. 'Tag#%{StatusTag()}',
+        \ '%#Status' .a:mode. 'FType#%{StatusFileType()}',
+        \ '%#Status' .a:mode. 'LInfo#%{StatusLineInfo()}',
+        \ '%#Status' .a:mode. 'Tmux#%{StatusTmux()}',
+        \ '%#Status' .a:mode. 'Validator#%{StatusValidator()}'
+        \ ]
+  exe 'setlocal statusline=' . join(parts, '')
+endfunction
+
+augroup mystatusline
+  autocmd WinEnter,BufWinEnter * call s:create_statusline('Active')
+  autocmd WinLeave * call s:create_statusline('Inactive')
+augroup END
