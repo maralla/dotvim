@@ -9,9 +9,14 @@
   name: "/Users/maralla/Workspace/project/completor-typescript"
   opt: false
 - 
-  category: base
+  category: default
   local: true
   name: /Users/maralla/Workspace/project/completor.vim
+  opt: false
+- 
+  category: default
+  local: true
+  name: /Users/maralla/Workspace/project/validator.vim
   opt: false
 - 
   category: lang
@@ -48,11 +53,6 @@
   category: default
   local: false
   name: SirVer/ultisnips
-  opt: false
-- 
-  category: default
-  local: false
-  name: "airblade/vim-gitgutter"
   opt: false
 - 
   category: themes
@@ -189,14 +189,14 @@
   name: majutsushi/tagbar
   opt: false
 - 
-  category: base
+  category: default
   local: false
-  name: maralla/mycolor
+  name: "maralla/completor-neosnippet"
   opt: false
 - 
-  category: base
+  category: default
   local: false
-  name: maralla/validator.vim
+  name: maralla/mycolor
   opt: false
 - 
   category: lang
@@ -334,9 +334,4 @@
   category: lang
   local: false
   name: "uarun/vim-protobuf"
-  opt: false
-- 
-  category: lang
-  local: false
-  name: "vim-python/python-syntax"
   opt: false

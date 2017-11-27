@@ -5,3 +5,4 @@ let g:validator_python_checkers = ['flake8']
 let g:validator_auto_open_quickfix = 0
 let g:validator_debug = 0
 let g:validator_go_checkers = ['gometalinter']
+let g:validator_highlight_message = 1

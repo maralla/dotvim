@@ -24,3 +24,4 @@ noremap <leader>d :call completor#do('definition')<CR>
 let g:completor_set_options = 1
 let g:completor_auto_close_doc = 1
 let g:completor_completion_delay = 200
+inoremap <silent> <Plug>CompletorTrigger <c-x><c-u>

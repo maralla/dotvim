@@ -101,7 +101,6 @@ set ignorecase " ignore case for searching
 set smartcase  " do case-sensitive if there's a capital letter
 
 set colorcolumn=80
-set cursorline
 
 " Autocmds.
 augroup myvimrc
@@ -111,6 +110,8 @@ augroup myvimrc
     \ if line("'\"") > 0 && line("'\"") <= line("$") |
     \  exe 'normal! g`"zvzz' |
     \ endif
+  autocmd WinEnter,BufWinEnter * set cursorline
+  autocmd WinLeave * set nocursorline
 augroup END
 
 
@@ -317,8 +318,12 @@ let s:mode_map = {
       \ '!':      '  SHELL  ',
       \ }
 
+function! s:status_ignore()
+  return winwidth(0) <= s:min_status_width || &ft ==# 'netrw'
+endfunction
+
 function! StatusMode()
-  if winwidth(0) <= s:min_status_width
+  if s:status_ignore()
     return ''
   endif
   let l:mode = mode()
@@ -326,14 +331,14 @@ function! StatusMode()
 endfunction
 
 function! StatusPaste()
-  if winwidth(0) <= s:min_status_width
+  if s:status_ignore()
     return ''
   endif
   return &paste ? ' PASTE ' : ''
 endfunction
 
 function! StatusBranch()
-  if winwidth(0) <= s:min_status_width || !exists('*fugitive#head')
+  if s:status_ignore() || !exists('*fugitive#head')
     return ''
   endif
   let branch = fugitive#head()
@@ -343,16 +348,18 @@ endfunction
 function! StatusFilename()
   let name = expand('%:t')
   let name = name !=# '' ? name : '[No Name]'
-  if name =~? 'netrw'
-    return 'netrw'
+  if &ft ==# 'netrw'
+    let name = 'netrw'
   endif
-  let readonly = &readonly ? "\ue0a2 " : ''
-  let modified = &modified ? ' +' : ''
-  return '    '.readonly . name . modified
+  let ignore = s:status_ignore()
+  let empty = ignore ? '  ' : '    '
+  let readonly = (!ignore && &readonly) ? "\ue0a2 " : ''
+  let modified = (!ignore && &modified) ? ' +' : ''
+  return empty . readonly . name . modified
 endfunction
 
 function! StatusTag()
-  if winwidth(0) <= s:min_status_width || !exists('*tagbar#currenttag')
+  if s:status_ignore() || !exists('*tagbar#currenttag')
     return ''
   endif
   let tag = tagbar#currenttag('%s', '', '')
@@ -360,14 +367,14 @@ function! StatusTag()
 endfunction
 
 function! StatusFileType()
-  if winwidth(0) <= s:min_status_width
+  if s:status_ignore()
     return ''
   endif
   return empty(&ft) ? '' : &ft . '   '
 endfunction
 
 function! StatusLineInfo()
-  if winwidth(0) <= s:min_status_width
+  if s:status_ignore()
     return ''
   endif
   let msg = printf('%-4d:%-3d', line('.'), col('.'))
@@ -375,33 +382,53 @@ function! StatusLineInfo()
 endfunction
 
 function! StatusTmux()
-  if winwidth(0) <= s:min_status_width
+  if s:status_ignore()
     return ''
   endif
   return $TERM ==? 'screen' && $TMUX !=? '' ? '   @tmux   ' : ''
 endfunction
 
 function! StatusValidator()
-  if winwidth(0) <= s:min_status_width
+  if s:status_ignore() || !exists('*validator#get_status_string')
     return ''
   endif
   return validator#get_status_string()
 endfunction
 
 
-function! s:create_statusline(mode)
-  hi StatusLine            guifg=#212121
-  hi StatusLineNC          guifg=#212121
-  hi StatusActiveMode      guifg=#757575 guibg=#212121
-  hi StatusActivePaste     guifg=#757575 guibg=#212121
-  hi StatusActiveBranch    guifg=#757575 guibg=#212121
-  hi StatusActiveFName     guifg=#757575 guibg=#212121
-  hi StatusActiveTag       guifg=#757575 guibg=#212121
-  hi StatusActiveFType     guifg=#757575 guibg=#212121
-  hi StatusActiveLInfo     guifg=#757575 guibg=#212121
-  hi StatusActiveTmux      guifg=#757575 guibg=#212121
-  hi StatusActiveValidator guifg=#C62828 guibg=#212121
+function! s:hi(item, bg, ...)
+  let fg = a:0 ? ' guifg=' . a:1 : ''
+  exe 'hi ' . a:item . fg . ' guibg=' . a:bg
+endfunction
 
+
+function! s:set_highlight()
+  let [bg, fg] = ['#0A3641', '#586e75']
+  if exists('$TMUX')
+    let [bg, fg] = ['#212121', '#757575']
+  endif
+
+  call s:hi('StatusLine', bg)
+  call s:hi('StatusLineNC', bg, bg)
+
+  if &ft ==# 'unite'
+    return
+  endif
+
+  call s:hi('StatusActiveMode', bg, fg)
+  hi link StatusActivePaste     StatusActiveMode
+  hi link StatusActiveBranch    StatusActiveMode
+  hi link StatusActiveFName     StatusActiveMode
+  hi link StatusActiveTag       StatusActiveMode
+  hi link StatusActiveFType     StatusActiveMode
+  hi link StatusActiveLInfo     StatusActiveMode
+  hi link StatusActiveTmux      StatusActiveMode
+  call s:hi('StatusActiveValidator', bg, '#C62828')
+endfunction
+call s:set_highlight()
+
+
+function! s:create_statusline(mode)
   let parts = [
         \ '%#Status' .a:mode. 'Mode#%{StatusMode()}',
         \ '%#Status' .a:mode. 'Paste#%{StatusPaste()}',
