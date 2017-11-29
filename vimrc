@@ -68,6 +68,7 @@ set softtabstop=4                                  " number of spaces per tab in
 set shiftwidth=4                                   " number of spaces when indenting
 set list                                           " highlight whitespace
 set listchars=tab:│\ ,trail:•,extends:❯,precedes:❮
+set fillchars+=vert:│
 set shiftround
 set linebreak
 
@@ -397,8 +398,17 @@ endfunction
 
 
 function! s:hi(item, bg, ...)
-  let fg = a:0 ? ' guifg=' . a:1 : ''
-  exe 'hi ' . a:item . fg . ' guibg=' . a:bg
+  let fg = ''
+  let extra = ''
+  if a:0 >= 2
+    let fg = a:1
+    let extra = a:2
+  elseif a:0 > 0
+    let fg = a:1
+  endif
+  let guifg = empty(fg) ? '' : ' guifg=' . fg
+  let extra = empty(extra) ? '' : ' ' . extra
+  exe 'hi ' . a:item . guifg . ' guibg=' . a:bg . extra
 endfunction
 
 
@@ -408,7 +418,7 @@ function! s:set_highlight()
     let [bg, fg] = ['#212121', '#757575']
   endif
 
-  call s:hi('StatusLine', bg)
+  call s:hi('StatusLine', bg, bg)
   call s:hi('StatusLineNC', bg, bg)
 
   if &ft ==# 'unite'
@@ -424,6 +434,11 @@ function! s:set_highlight()
   hi link StatusActiveLInfo     StatusActiveMode
   hi link StatusActiveTmux      StatusActiveMode
   call s:hi('StatusActiveValidator', bg, '#C62828')
+
+  call s:hi('VertSplit', bg, fg)
+  call s:hi('SignColumn', bg)
+  call s:hi('ValidatorErrorSign', bg, '#C62828', 'cterm=bold')
+  call s:hi('ValidatorWarningSign', bg, '#F9A825', 'cterm=bold')
 endfunction
 call s:set_highlight()
 

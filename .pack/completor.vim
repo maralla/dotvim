@@ -19,9 +19,8 @@ let g:completor_tex_omni_trigger = '\\\\(:?'
 " let g:completor_auto_trigger = 0
 " inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<C-x>\<C-u>\<C-p>"
 
-noremap <leader>d :call completor#do('definition')<CR>
+noremap <silent> <leader>d :call completor#do('definition')<CR>
 " let g:completor_javascript_omni_trigger = "\\w+$|[\\w\\)\\]\\}\'\"]+\\.\\w*$"
 let g:completor_set_options = 1
 let g:completor_auto_close_doc = 1
 let g:completor_completion_delay = 200
-inoremap <silent> <Plug>CompletorTrigger <c-x><c-u>
