@@ -29,10 +29,10 @@ endfunction
 
 if 0 | endif
 
+" settings {{{
 filetype plugin indent on
 syntax enable
 
-" settings {{{
 " set t_Co=256
 " set background=dark
 set termguicolors
@@ -147,38 +147,23 @@ else
   let &t_SI = "\<Esc>]50;CursorShape=1\x7"
   let &t_EI = "\<Esc>]50;CursorShape=0\x7"
 endif
+"}}}
 
+
+" mappings {{{
 let mapleader = ','
 let g:mapleader = ','
 
-" mappings
 vmap <leader>s :sort<cr>
 nnoremap <leader>w :w<cr>
 map <leader>pp :set paste!<CR>
 nmap <silent> <leader>,/ :nohlsearch<CR>
 cmap w!! w !sudo tee % >/dev/null
 
-" buffer
-nnoremap <S-H> :bprev<CR>
-nnoremap <S-L> :bnext<CR>
-
-" tab
-map <leader>tn :tabnew<CR>
-map <leader>tc :tabclose<CR>
-nnoremap <left> :tabprev<CR>
-nnoremap <right> :tabnext<CR>
-nnoremap <down> :tabprev<CR>
-nnoremap <up> :tabnext<CR>
-
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
-
-nnoremap zr zr:echo &foldlevel<cr>
-nnoremap zm zm:echo &foldlevel<cr>
-nnoremap zR zR:echo &foldlevel<cr>
-nnoremap zM zM:echo &foldlevel<cr>
 
 nnoremap <silent> j gj
 nnoremap <silent> k gk
@@ -204,9 +189,6 @@ nnoremap <leader>fw :execute "vimgrep ".expand("<cword>")." %"<cr>:copen<cr>
 " find last search in quickfix
 nnoremap <leader>ff :execute 'vimgrep /'.@/.'/g %'<cr>:copen<cr>
 
-" Remove the Windows ^M - when the encodings gets messed up
-noremap <Leader>m mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm
-
 " make Y consistent with C and D. See :help Y.
 nnoremap Y y$
 
@@ -219,16 +201,16 @@ nnoremap gb :ls<cr>:e #
 " general
 nmap <leader>l :set list! list?<cr>
 
-command! -bang Q q<bang>
-command! -bang QA qa<bang>
-command! -bang Qa qa<bang>
+" insert empty line
+nmap <leader><space> m`o<ESC>``
+
 
 "}}}
 
 "netrw
 let g:netrw_liststyle = 3
 let g:netrw_banner = 0
-let g:netrw_list_hide= '__pycache__,.*\.pyc$,.*\.swp,\.git,\.ropeproject,\.cache,build,\.egg-info,dist'
+let g:netrw_list_hide= '__pycache__,.*\.pyc$,.*\.swp,\.git,\.ropeproject,\.cache,build,\.egg-info,dist,\.DS_Store'
 
 " cscope {{{
 let g:cscope_db_added = 0
@@ -271,7 +253,7 @@ endfunction
 
 function! CreateCscopeDB()
   if has('cscope')
-    silent call system('find . -iname *.c -o -iname *.h -o -iname *.cpp > .cscope.files')
+    silent call system("find . -iname '*.c' -o -iname '*.h' -o -iname '*.cpp' > .cscope.files")
     silent call system('cscope -b -i .cscope.files -f .cscope.out')
     silent :cs reset
     redraw!
@@ -284,9 +266,9 @@ function! UpdateCscopeDB()
   endif
 endfunction
 
-autocmd BufNewFile,BufRead *.c,*.h,*.cpp call SetupCscope()
-autocmd BufNewFile,BufWritePost *.c,*.h,*.cpp call UpdateCscopeDB()
-nmap <leader><leader>s :call CreateCscopeDB()<CR>
+" autocmd BufNewFile,BufRead *.c,*.h,*.cpp call SetupCscope()
+" autocmd BufNewFile,BufWritePost *.c,*.h,*.cpp call UpdateCscopeDB()
+" nmap <leader><leader>s :call CreateCscopeDB()<CR>
 "}}}
 
 
