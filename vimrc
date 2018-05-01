@@ -416,6 +416,7 @@ function! s:set_highlight()
   hi link StatusActiveLInfo     StatusActiveMode
   hi link StatusActiveTmux      StatusActiveMode
   call s:hi('StatusActiveValidator', bg, '#C62828')
+  call s:hi('StatusInactiveFName', bg, fg)
 
   call s:hi('VertSplit', bg, fg)
   call s:hi('SignColumn', bg)
@@ -425,19 +426,28 @@ endfunction
 call s:set_highlight()
 
 
+function! StatusSpace()
+  return '  '
+endfunction
+
+
 function! s:create_statusline(mode)
-  let parts = [
-        \ '%#Status' .a:mode. 'Mode#%{StatusMode()}',
-        \ '%#Status' .a:mode. 'Paste#%{StatusPaste()}',
-        \ '%#Status' .a:mode. 'Branch#%-{StatusBranch()}',
-        \ '%#Status' .a:mode. 'FName#%{StatusFilename()}',
-        \ '%=',
-        \ '%#Status' .a:mode. 'Tag#%{StatusTag()}',
-        \ '%#Status' .a:mode. 'FType#%{StatusFileType()}',
-        \ '%#Status' .a:mode. 'LInfo#%{StatusLineInfo()}',
-        \ '%#Status' .a:mode. 'Tmux#%{StatusTmux()}',
-        \ '%#Status' .a:mode. 'Validator#%{StatusValidator()}'
-        \ ]
+  if a:mode ==? 'active'
+    let parts = [
+          \ '%#Status' .a:mode. 'Mode#%{StatusMode()}',
+          \ '%#Status' .a:mode. 'Paste#%{StatusPaste()}',
+          \ '%#Status' .a:mode. 'Branch#%-{StatusBranch()}',
+          \ '%#Status' .a:mode. 'FName#%{StatusFilename()}',
+          \ '%=',
+          \ '%#Status' .a:mode. 'Tag#%{StatusTag()}',
+          \ '%#Status' .a:mode. 'FType#%{StatusFileType()}',
+          \ '%#Status' .a:mode. 'LInfo#%{StatusLineInfo()}',
+          \ '%#Status' .a:mode. 'Tmux#%{StatusTmux()}',
+          \ '%#Status' .a:mode. 'Validator#%{StatusValidator()}'
+          \ ]
+  else
+    let parts = ['%{StatusSpace()}', '%#Status' .a:mode. 'FName#%{StatusFilename()}']
+  endif
   exe 'setlocal statusline=' . join(parts, '')
 endfunction
 
