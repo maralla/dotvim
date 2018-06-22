@@ -8,6 +8,7 @@ let g:unite_force_overwrite_statusline = 0
 
 let g:unite_source_grep_command = 'rg'
 let g:unite_source_grep_default_opts = '--vimgrep --no-ignore-vcs'
+let g:unite_source_grep_recursive_opt = ''
 
 nmap <space> [unite]
 nnoremap [unite] <nop>

@@ -18,12 +18,17 @@ let g:completor_tex_omni_trigger = '\\\\(:?'
 " let g:completor_cpp_omni_trigger = ''
 
 " let g:completor_auto_trigger = 0
-" inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<C-x>\<C-u>\<C-p>"
+" inoremap <expr> <c-n> pumvisible() ? "<C-N>" : "<C-R>=completor#do('complete')<CR>"
+
+" inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+" inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 
 noremap <silent> <leader>d :call completor#do('definition')<CR>
+noremap <silent> <leader>c :call completor#do('doc')<CR>
 " let g:completor_javascript_omni_trigger = "\\w+$|[\\w\\)\\]\\}\'\"]+\\.\\w*$"
 let g:completor_set_options = 1
 let g:completor_auto_close_doc = 1
 let g:completor_completion_delay = 200
+let g:completor_go_guru_binary = 'guru'
 map <c-\> <Plug>CompletorCppJumpToPlaceholder
 imap <c-\> <Plug>CompletorCppJumpToPlaceholder

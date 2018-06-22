@@ -325,18 +325,18 @@ function! StatusBranch()
     return ''
   endif
   let branch = fugitive#head()
-  return empty(branch) ? '' : "   \ue0a0 " . branch
+  return empty(branch) ? '' : "   \uF020 " . branch
 endfunction
 
 function! StatusFilename()
   let name = expand('%:t')
   let name = name !=# '' ? name : '[No Name]'
   if &ft ==# 'netrw'
-    let name = 'netrw'
+    let name = '  netrw'
   endif
   let ignore = s:status_ignore()
   let empty = ignore ? '  ' : '    '
-  let readonly = (!ignore && &readonly) ? "\ue0a2 " : ''
+  let readonly = (!ignore && &readonly) ? "\u2b64 " : ''
   let modified = (!ignore && &modified) ? ' +' : ''
   return empty . readonly . name . modified
 endfunction
@@ -361,7 +361,7 @@ function! StatusLineInfo()
     return ''
   endif
   let msg = printf('%-4d:%-3d', line('.'), col('.'))
-  return " \ue0a1 " . msg
+  return " \u2b61 " . msg
 endfunction
 
 function! StatusTmux()
@@ -427,7 +427,7 @@ call s:set_highlight()
 
 
 function! StatusSpace()
-  return '  '
+  return &ft ==# 'netrw' ? '' : '  '
 endfunction
 
 
