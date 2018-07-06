@@ -330,15 +330,14 @@ endfunction
 
 function! StatusFilename()
   let name = expand('%:t')
-  let name = name !=# '' ? name : '[No Name]'
+  let name = name !=# '' ? "\uf022 " . name : '[No Name]'
   if &ft ==# 'netrw'
     let name = '  netrw'
   endif
+  call s:hi_filename()
   let ignore = s:status_ignore()
   let empty = ignore ? '  ' : '    '
-  let readonly = (!ignore && &readonly) ? "\u2b64 " : ''
-  let modified = (!ignore && &modified) ? ' +' : ''
-  return empty . readonly . name . modified
+  return empty . name
 endfunction
 
 function! StatusTag()
@@ -350,7 +349,7 @@ function! StatusTag()
 endfunction
 
 function! StatusFileType()
-  if s:status_ignore()
+  if s:status_ignore() || get(b:, 'statusline_hide_filetype', v:true)
     return ''
   endif
   return empty(&ft) ? '' : &ft . '   '
@@ -394,34 +393,50 @@ function! s:hi(item, bg, ...)
 endfunction
 
 
-function! s:set_highlight()
-  let [bg, fg] = ['#0A3641', '#586e75']
-  if exists('$TMUX')
-    let [bg, fg] = ['#212121', '#757575']
-  endif
+let [s:bg, s:fg] = ['#0A3641', '#586e75']
+if exists('$TMUX')
+  let [s:bg, s:fg] = ['#212121', '#757575']
+endif
 
-  call s:hi('StatusLine', bg, bg)
-  call s:hi('StatusLineNC', bg, bg)
+function! s:hi_filename()
+  if &modified
+    call s:hi('StatusActiveFName', s:bg, '#FFAB00')
+    call s:hi('StatusInactiveFName', s:bg, '#FFAB00')
+  elseif &readonly
+    call s:hi('StatusActiveFName', s:bg, '#525252')
+    call s:hi('StatusInactiveFName', s:bg, '#525252')
+  else
+    hi clear StatusActiveFName
+    hi clear StatusInactiveFName
+    hi link StatusActiveFName       StatusActiveMode
+    hi link StatusInactiveFName     StatusActiveMode
+  endif
+endfunction
+
+
+function! s:set_highlight()
+  call s:hi('StatusLine', s:bg, s:bg)
+  call s:hi('StatusLineNC', s:bg, s:bg)
 
   if &ft ==# 'unite'
     return
   endif
 
-  call s:hi('StatusActiveMode', bg, fg)
+  call s:hi('StatusActiveMode', s:bg, s:fg)
   hi link StatusActivePaste     StatusActiveMode
   hi link StatusActiveBranch    StatusActiveMode
-  hi link StatusActiveFName     StatusActiveMode
   hi link StatusActiveTag       StatusActiveMode
   hi link StatusActiveFType     StatusActiveMode
   hi link StatusActiveLInfo     StatusActiveMode
   hi link StatusActiveTmux      StatusActiveMode
-  call s:hi('StatusActiveValidator', bg, '#C62828')
-  call s:hi('StatusInactiveFName', bg, fg)
 
-  call s:hi('VertSplit', bg, fg)
-  call s:hi('SignColumn', bg)
-  call s:hi('ValidatorErrorSign', bg, '#C62828', 'cterm=bold')
-  call s:hi('ValidatorWarningSign', bg, '#F9A825', 'cterm=bold')
+  call s:hi_filename()
+  call s:hi('StatusActiveValidator', s:bg, '#C62828')
+
+  call s:hi('VertSplit', s:bg, s:fg)
+  call s:hi('SignColumn', s:bg)
+  call s:hi('ValidatorErrorSign', s:bg, '#C62828', 'cterm=bold')
+  call s:hi('ValidatorWarningSign', s:bg, '#F9A825', 'cterm=bold')
 endfunction
 call s:set_highlight()
 

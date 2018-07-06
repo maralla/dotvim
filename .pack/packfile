@@ -8,196 +8,234 @@
   local: true
   name: "/Users/maralla/Workspace/project/completor-typescript"
   opt: false
+  reference: HEAD
 - 
   category: default
   local: true
   name: /Users/maralla/Workspace/project/completor.vim
   opt: false
+  reference: HEAD
 - 
   category: default
   local: true
   name: /Users/maralla/Workspace/project/validator.vim
   opt: false
+  reference: HEAD
 - 
   category: lang
   local: false
   name: "Glench/Vim-Jinja2-Syntax"
   opt: false
+  reference: HEAD
 - 
   category: default
   local: false
   name: "Lokaltog/vim-easymotion"
   opt: false
+  reference: HEAD
 - 
   category: default
   local: false
   name: "Shougo/neosnippet-snippets"
   opt: false
+  reference: HEAD
 - 
   category: default
   local: false
   name: Shougo/neosnippet.vim
   opt: false
+  reference: HEAD
 - 
   category: default
   local: false
   name: Shougo/unite.vim
   opt: false
+  reference: HEAD
 - 
   build: make
   category: default
   local: false
   name: Shougo/vimproc.vim
   opt: false
+  reference: HEAD
 - 
   category: default
   local: false
   name: SirVer/ultisnips
   opt: false
+  reference: HEAD
 - 
   category: themes
   local: false
   name: "altercation/vim-colors-solarized"
   opt: true
+  reference: HEAD
 - 
   category: lang
   local: false
   name: "cakebaker/scss-syntax.vim"
   opt: false
+  reference: HEAD
 - 
   category: lang
   local: false
   name: "cespare/vim-toml"
   opt: false
+  reference: HEAD
 - 
   category: default
   local: false
   name: chrisbra/NrrwRgn
   opt: false
+  reference: HEAD
 - 
   category: lang
   local: false
   name: "dag/vim-fish"
   opt: false
+  reference: HEAD
 - 
   category: default
   local: false
   name: "dhruvasagar/vim-table-mode"
   on: TableModeToggle
   opt: true
+  reference: HEAD
 - 
   category: default
   local: false
   name: "editorconfig/editorconfig-vim"
   opt: false
+  reference: HEAD
 - 
   category: lang
   local: false
   name: "elzr/vim-json"
   opt: false
+  reference: HEAD
 - 
   category: default
   local: false
   name: godlygeek/tabular
   on: Tabularize
   opt: true
+  reference: HEAD
 - 
   category: default
   local: false
   name: gorkunov/smartpairs.vim
   opt: false
+  reference: HEAD
 - 
   category: default
   local: false
   name: gregsexton/MatchTag
   opt: false
+  reference: HEAD
 - 
   category: default
   local: false
   name: gregsexton/gitv
   on: Gitv
   opt: true
+  reference: HEAD
 - 
   category: lang
   local: false
   name: "groenewege/vim-less"
   opt: false
+  reference: HEAD
 - 
   category: default
   local: false
   name: "guns/xterm-color-table.vim"
   on: XtermColorTable
   opt: true
+  reference: HEAD
 - 
   category: lang
   local: false
   name: "hail2u/vim-css3-syntax"
   opt: false
+  reference: HEAD
 - 
   category: default
   local: false
   name: "honza/vim-snippets"
   opt: false
+  reference: HEAD
 - 
   category: default
   local: false
   name: "hynek/vim-python-pep8-indent"
   opt: false
+  reference: HEAD
 - 
   category: default
   local: false
   name: "jiangmiao/auto-pairs"
   opt: false
+  reference: HEAD
 - 
   category: lang
   local: false
   name: "justinmk/vim-syntax-extra"
   opt: false
+  reference: HEAD
 - 
   category: lang
   local: false
   name: "kchmck/vim-coffee-script"
   opt: false
+  reference: HEAD
 - 
   category: lang
   local: false
   name: keith/swift.vim
   opt: false
+  reference: HEAD
 - 
   category: default
   local: false
   name: ksauzz/thrift.vim
   opt: false
+  reference: HEAD
 - 
   category: lang
   local: false
   name: "leafgarland/typescript-vim"
   opt: false
+  reference: HEAD
 - 
   category: themes
   local: false
   name: "lifepillar/vim-solarized8"
   opt: true
+  reference: HEAD
 - 
   category: default
   local: false
   name: majutsushi/tagbar
   opt: false
+  reference: HEAD
 - 
   category: default
   local: false
   name: "maralla/completor-neosnippet"
   opt: false
+  reference: HEAD
 - 
   category: default
   local: false
   name: maralla/mycolor
   opt: false
+  reference: HEAD
 - 
   category: lang
   local: false
   name: "maralla/vim-toml-enhance"
   opt: false
+  reference: HEAD
 - 
   category: default
   for: 
@@ -215,38 +253,45 @@
   local: false
   name: "mattn/emmet-vim"
   opt: true
+  reference: HEAD
 - 
   category: default
   local: false
   name: "mattn/gist-vim"
   on: Gist
   opt: true
+  reference: HEAD
 - 
   category: default
   local: false
   name: "mattn/webapi-vim"
   opt: false
+  reference: HEAD
 - 
   category: default
   local: false
   name: "nathanaelkane/vim-indent-guides"
   on: IndentGuidesToggle
   opt: true
+  reference: HEAD
 - 
   category: default
   local: false
   name: othree/html5.vim
   opt: false
+  reference: HEAD
 - 
   category: default
   local: false
   name: "pangloss/vim-javascript"
   opt: false
+  reference: HEAD
 - 
   category: lang
   local: false
   name: "posva/vim-vue"
   opt: false
+  reference: HEAD
 - 
   category: default
   for: 
@@ -255,78 +300,94 @@
   local: false
   name: "rhysd/vim-clang-format"
   opt: true
+  reference: HEAD
 - 
   category: lang
   local: false
   name: "rust-lang/rust.vim"
   opt: false
+  reference: HEAD
 - 
   category: lang
   local: false
   name: "saltstack/salt-vim"
   opt: false
+  reference: HEAD
 - 
   category: default
   local: false
   name: "terryma/vim-expand-region"
   opt: false
+  reference: HEAD
 - 
   category: default
   local: false
   name: "terryma/vim-multiple-cursors"
   opt: false
+  reference: HEAD
 - 
   category: default
   local: false
   name: "thinca/vim-visualstar"
   opt: false
+  reference: HEAD
 - 
   category: default
   local: false
   name: tomtom/tcomment_vim
   opt: false
+  reference: HEAD
 - 
   category: default
   local: false
   name: "tpope/vim-endwise"
   opt: false
+  reference: refs/heads/master
 - 
   category: default
   local: false
   name: "tpope/vim-fugitive"
   opt: false
+  reference: HEAD
 - 
   category: default
   local: false
   name: "tpope/vim-markdown"
   opt: false
+  reference: HEAD
 - 
   category: default
   local: false
   name: "tpope/vim-repeat"
   opt: false
+  reference: HEAD
 - 
   category: default
   local: false
   name: "tpope/vim-speeddating"
   opt: false
+  reference: HEAD
 - 
   category: default
   local: false
   name: "tpope/vim-surround"
   opt: false
+  reference: HEAD
 - 
   category: base
   local: false
   name: "tpope/vim-unimpaired"
   opt: false
+  reference: HEAD
 - 
   category: lang
   local: false
   name: "tshirtman/vim-cython"
   opt: false
+  reference: HEAD
 - 
   category: lang
   local: false
   name: "uarun/vim-protobuf"
   opt: false
+  reference: HEAD
