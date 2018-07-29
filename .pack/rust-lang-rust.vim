@@ -1,4 +1,4 @@
-let g:rustfmt_autosave = 1
+let g:rustfmt_autosave = 0
 
 autocmd BufNewFile,BufRead *.rs setlocal colorcolumn=100
 "autocmd BufWritePre *.rs call rustfmt#Format()

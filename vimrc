@@ -393,18 +393,28 @@ function! s:hi(item, bg, ...)
 endfunction
 
 
-let [s:bg, s:fg] = ['#0A3641', '#586e75']
+let s:color = {
+      \ 'status_bg': '#0A3641',
+      \ 'status_fg': '#586e75',
+      \ 'fname_modified': '#c38300',
+      \ 'fname_readonly': '#364950',
+      \ }
 if exists('$TMUX')
-  let [s:bg, s:fg] = ['#212121', '#757575']
+  let s:color = {
+        \ 'status_bg': '#212121',
+        \ 'status_fg': '#757575',
+        \ 'fname_modified': '#c38300',
+        \ 'fname_readonly': '#525252',
+        \ }
 endif
 
 function! s:hi_filename()
   if &modified
-    call s:hi('StatusActiveFName', s:bg, '#FFAB00')
-    call s:hi('StatusInactiveFName', s:bg, '#FFAB00')
+    call s:hi('StatusActiveFName', s:color.status_bg, s:color.fname_modified)
+    call s:hi('StatusInactiveFName', s:color.status_bg, s:color.fname_modified)
   elseif &readonly
-    call s:hi('StatusActiveFName', s:bg, '#525252')
-    call s:hi('StatusInactiveFName', s:bg, '#525252')
+    call s:hi('StatusActiveFName', s:color.status_bg, s:color.fname_readonly)
+    call s:hi('StatusInactiveFName', s:color.status_bg, s:color.fname_readonly)
   else
     hi clear StatusActiveFName
     hi clear StatusInactiveFName
@@ -415,14 +425,14 @@ endfunction
 
 
 function! s:set_highlight()
-  call s:hi('StatusLine', s:bg, s:bg)
-  call s:hi('StatusLineNC', s:bg, s:bg)
+  call s:hi('StatusLine', s:color.status_bg, s:color.status_bg)
+  call s:hi('StatusLineNC', s:color.status_bg, s:color.status_bg)
 
   if &ft ==# 'unite'
     return
   endif
 
-  call s:hi('StatusActiveMode', s:bg, s:fg)
+  call s:hi('StatusActiveMode', s:color.status_bg, s:color.status_fg)
   hi link StatusActivePaste     StatusActiveMode
   hi link StatusActiveBranch    StatusActiveMode
   hi link StatusActiveTag       StatusActiveMode
@@ -431,12 +441,12 @@ function! s:set_highlight()
   hi link StatusActiveTmux      StatusActiveMode
 
   call s:hi_filename()
-  call s:hi('StatusActiveValidator', s:bg, '#C62828')
+  call s:hi('StatusActiveValidator', s:color.status_bg, '#C62828')
 
-  call s:hi('VertSplit', s:bg, s:fg)
-  call s:hi('SignColumn', s:bg)
-  call s:hi('ValidatorErrorSign', s:bg, '#C62828', 'cterm=bold')
-  call s:hi('ValidatorWarningSign', s:bg, '#F9A825', 'cterm=bold')
+  call s:hi('VertSplit', s:color.status_bg, s:color.status_fg)
+  call s:hi('SignColumn', s:color.status_bg)
+  call s:hi('ValidatorErrorSign', s:color.status_bg, '#C62828', 'cterm=bold')
+  call s:hi('ValidatorWarningSign', s:color.status_bg, '#F9A825', 'cterm=bold')
 endfunction
 call s:set_highlight()
 
@@ -447,6 +457,10 @@ endfunction
 
 
 function! s:create_statusline(mode)
+  if &ft ==# 'unite'
+    return
+  endif
+
   if a:mode ==? 'active'
     let parts = [
           \ '%#Status' .a:mode. 'Mode#%{StatusMode()}',
