@@ -1,9 +1,5 @@
 function! Log(msg) abort
-py << EOF
-import vim
-with open('/tmp/vim-log', 'a') as f:
-  f.write(vim.bindeval('a:')['msg'] + '\n')
-EOF
+  call writefile([a:msg."\n"], '/tmp/vim-log', 'a')
 endfunction
 
 
