@@ -4,21 +4,6 @@
 
 ---
 - 
-  category: default
-  local: true
-  name: "/Users/maralla/Workspace/project/completor-typescript"
-  opt: false
-- 
-  category: default
-  local: true
-  name: /Users/maralla/Workspace/project/completor.vim
-  opt: false
-- 
-  category: default
-  local: true
-  name: /Users/maralla/Workspace/project/validator.vim
-  opt: false
-- 
   category: lang
   local: false
   name: "Glench/Vim-Jinja2-Syntax"
@@ -191,7 +176,27 @@
 - 
   category: default
   local: false
+  name: "maralla/completor-swift"
+  opt: false
+- 
+  category: default
+  local: false
+  name: "maralla/completor-typescript"
+  opt: false
+- 
+  category: default
+  local: false
+  name: maralla/completor.vim
+  opt: false
+- 
+  category: default
+  local: false
   name: maralla/mycolor
+  opt: false
+- 
+  category: default
+  local: false
+  name: maralla/validator.vim
   opt: false
 - 
   category: lang
@@ -279,11 +284,6 @@
   category: default
   local: false
   name: "terryma/vim-multiple-cursors"
-  opt: false
-- 
-  category: default
-  local: false
-  name: "thinca/vim-visualstar"
   opt: false
 - 
   category: default
