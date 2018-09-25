@@ -1,0 +1,14 @@
+global !p
+def is_upper(arg):
+	return arg and arg[0].isupper()
+endglobal
+
+snippet func "function" b
+`!p
+snip.rv = ""
+if is_upper(t[1]):
+	snip.rv = "// {} ...".format(t[1])
+`
+func ${1:myFunc}(${2:args}) {
+}
+endsnippet

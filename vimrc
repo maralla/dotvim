@@ -68,7 +68,7 @@ set softtabstop=4                                  " number of spaces per tab in
 set shiftwidth=4                                   " number of spaces when indenting
 set list                                           " highlight whitespace
 set listchars=tab:│\ ,trail:•,extends:❯,precedes:❮
-set fillchars+=vert:│
+set fillchars=vert:│,fold:\ 
 set shiftround
 set linebreak
 
@@ -84,11 +84,12 @@ set splitright
 
 set showmatch    " automatically highlight matching braces/brackets/etc.
 set matchtime=2  " tens of a second to show matching parentheses
-set number
+" set number
 set lazyredraw
 set laststatus=2
 set noshowmode
 set nofoldenable " disable folds by default
+
 
 " disable sounds
 set noerrorbells
@@ -102,11 +103,13 @@ set ignorecase " ignore case for searching
 set smartcase  " do case-sensitive if there's a capital letter
 
 set colorcolumn=80
+set signcolumn=yes
 
 " Autocmds.
 augroup myvimrc
   autocmd BufNewFile,BufRead *.h setfiletype c
   autocmd FileType css,less,javascript,json,html,php,puppet,yaml,jinja,vim setlocal shiftwidth=2 tabstop=2 softtabstop=2
+  autocmd FileType go setlocal noexpandtab
   autocmd BufReadPost *
     \ if line("'\"") > 0 && line("'\"") <= line("$") |
     \  exe 'normal! g`"zvzz' |
@@ -170,10 +173,7 @@ nnoremap <silent> k gk
 
 nnoremap <silent> n nzz
 nnoremap <silent> N Nzz
-nnoremap <silent> * *zz
-nnoremap <silent> # #zz
-nnoremap <silent> g* g*zz
-nnoremap <silent> g# g#zz
+nnoremap <silent> * *N
 nnoremap <silent> <C-o> <C-o>zz
 nnoremap <silent> <C-i> <C-i>zz
 
@@ -204,7 +204,19 @@ nmap <leader>l :set list! list?<cr>
 " insert empty line
 nmap <leader><space> m`o<ESC>``
 
+function! s:get_selected()
+  try
+    let bak = @a
+    silent! normal! gv"ay
+    return @a
+  finally
+    let @a = bak
+  endtry
+endfunction
+vnoremap * <ESC>:call setreg("/", <SID>get_selected())<CR>nN
 
+" file finder
+nnoremap <space>f :call filefinder#start()<CR>
 "}}}
 
 "netrw
@@ -424,11 +436,14 @@ function! s:hi_filename()
 endfunction
 
 
+let s:status_ignored_types = ['unite', 'finder']
+
+
 function! s:set_highlight()
   call s:hi('StatusLine', s:color.status_bg, s:color.status_bg)
   call s:hi('StatusLineNC', s:color.status_bg, s:color.status_bg)
 
-  if &ft ==# 'unite'
+  if index(s:status_ignored_types, &ft) >= 0
     return
   endif
 
@@ -457,7 +472,7 @@ endfunction
 
 
 function! s:create_statusline(mode)
-  if &ft ==# 'unite'
+  if index(s:status_ignored_types, &ft) >= 0
     return
   endif
 
@@ -480,7 +495,16 @@ function! s:create_statusline(mode)
   exe 'setlocal statusline=' . join(parts, '')
 endfunction
 
-augroup mystatusline
+augroup mystatusline "{{{
   autocmd WinEnter,BufWinEnter * call s:create_statusline('Active')
   autocmd WinLeave * call s:create_statusline('Inactive')
-augroup END
+augroup END "}}}
+
+
+" ********************************
+" colorscheme
+hi Constant guifg=#009688
+hi Folded guifg=#616161 guibg=NONE
+hi Statement guifg=#43A047 cterm=bold
+hi PreProc guifg=#AD1457
+" ********************************

@@ -25,7 +25,7 @@ let g:completor_tex_omni_trigger = '\\\\(:?'
 
 noremap <silent> <leader>d :call completor#do('definition')<CR>
 noremap <silent> <leader>c :call completor#do('doc')<CR>
-noremap <silent> <leader>c :call completor#do('doc')<CR>
+noremap <silent> <leader>f :call completor#do('format')<CR>
 " let g:completor_javascript_omni_trigger = "\\w+$|[\\w\\)\\]\\}\'\"]+\\.\\w*$"
 let g:completor_set_options = 1
 let g:completor_auto_close_doc = 1
