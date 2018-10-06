@@ -48,15 +48,22 @@ func s:fetch_files(cwd)
 endfunc
 
 
-func s:on_data(ch)
+func s:on_data(ch) abort
   let s:files = []
   let i = 0
-  while ch_canread(a:ch)
-    let indent = printf('%*s', strchars(s:prompt_indicator), ' ')
-    call add(s:files, indent . '#'.string(i).'#'.ch_read(a:ch))
-    let i += 1
-  endwhile
-  call s:put_content(s:files)
+  try
+    while ch_canread(a:ch)
+      let indent = printf('%*s', strchars(s:prompt_indicator), ' ')
+      call add(s:files, indent . '#'.string(i).'#'.ch_read(a:ch))
+      let i += 1
+    endwhile
+    call s:put_content(s:files)
+  catch /E906/
+    call s:close_finder()
+    echohl Error
+    echo 'Fail to run finder'
+    echohl None
+  endtry
 endfunc
 
 
@@ -144,6 +151,13 @@ func s:open_finder() abort
   exe 'resize '. float2nr(round(0.4*&lines))
 endfunc
 
+func s:close_finder() abort
+  let nr = bufwinnr(s:filename)
+  if nr > 0
+    call feedkeys("\<ESC>")
+    exe 'silent ' . nr . ' wincmd c'
+  endif
+endfunc
 
 func s:init() abort
   setlocal bufhidden=hide
