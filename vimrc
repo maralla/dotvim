@@ -406,19 +406,19 @@ endfunction
 
 
 let s:color = {
-      \ 'status_bg': '#0A3641',
-      \ 'status_fg': '#586e75',
+      \ 'status_bg': '#212121',
+      \ 'status_fg': '#757575',
       \ 'fname_modified': '#c38300',
-      \ 'fname_readonly': '#364950',
+      \ 'fname_readonly': '#525252',
       \ }
-if exists('$TMUX')
-  let s:color = {
-        \ 'status_bg': '#212121',
-        \ 'status_fg': '#757575',
-        \ 'fname_modified': '#c38300',
-        \ 'fname_readonly': '#525252',
-        \ }
-endif
+" if exists('$TMUX')
+"   let s:color = {
+"         \ 'status_bg': '#212121',
+"         \ 'status_fg': '#757575',
+"         \ 'fname_modified': '#c38300',
+"         \ 'fname_readonly': '#525252',
+"         \ }
+" endif
 
 function! s:hi_filename()
   if &modified
@@ -503,8 +503,17 @@ augroup END "}}}
 
 " ********************************
 " colorscheme
-hi Constant guifg=#009688
+hi Constant guifg=#00897B
 hi Folded guifg=#616161 guibg=NONE
 hi Statement guifg=#43A047 cterm=bold
 hi PreProc guifg=#AD1457
+hi SpecialKey guifg=#3f4f54 guibg=#212121
+hi Normal guibg=#161616
+hi CursorLine guibg=#212121
+hi ColorColumn guibg=#212121
+hi LineNr guibg=#212121
+hi CursorLineNr guibg=#212121 guifg=#839496
+hi DiffAdd guibg=#212121
+hi DiffChange guibg=#212121
+hi DiffDelete guibg=#212121
 " ********************************
