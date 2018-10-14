@@ -24,11 +24,6 @@
   name: Shougo/neosnippet.vim
   opt: false
 - 
-  category: default
-  local: false
-  name: Shougo/unite.vim
-  opt: false
-- 
   build: make
   category: default
   local: false

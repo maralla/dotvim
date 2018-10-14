@@ -511,6 +511,7 @@ hi SpecialKey guifg=#3f4f54 guibg=#212121
 hi Normal guibg=#161616
 hi CursorLine guibg=#212121
 hi ColorColumn guibg=#212121
+hi MatchParen gui=bold guifg=#fdf6e3 guibg=NONE
 hi LineNr guibg=#212121
 hi CursorLineNr guibg=#212121 guifg=#839496
 hi DiffAdd guibg=#212121

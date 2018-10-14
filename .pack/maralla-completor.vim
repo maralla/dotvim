@@ -33,3 +33,8 @@ let g:completor_completion_delay = 200
 let g:completor_go_guru_binary = 'guru'
 map <c-\> <Plug>CompletorCppJumpToPlaceholder
 imap <c-\> <Plug>CompletorCppJumpToPlaceholder
+
+augroup completor_config
+  autocmd!
+  autocmd BufWritePost *.go :call completor#do('format')
+augroup end
