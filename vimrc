@@ -379,7 +379,7 @@ function! StatusTmux()
   if s:status_ignore()
     return ''
   endif
-  return $TERM ==? 'screen' && $TMUX !=? '' ? '   @tmux   ' : ''
+  return $TERM =~? '^screen' && $TMUX !=? '' ? '   @tmux   ' : ''
 endfunction
 
 function! StatusValidator()
