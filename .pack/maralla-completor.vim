@@ -31,6 +31,7 @@ let g:completor_set_options = 1
 let g:completor_auto_close_doc = 1
 let g:completor_completion_delay = 200
 let g:completor_go_guru_binary = 'guru'
+let g:completor_go_gofmt_binary = 'goimports'
 map <c-\> <Plug>CompletorCppJumpToPlaceholder
 imap <c-\> <Plug>CompletorCppJumpToPlaceholder
 

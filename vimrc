@@ -110,10 +110,6 @@ augroup myvimrc
   autocmd BufNewFile,BufRead *.h setfiletype c
   autocmd FileType css,less,javascript,json,html,php,puppet,yaml,jinja,vim setlocal shiftwidth=2 tabstop=2 softtabstop=2
   autocmd FileType go setlocal noexpandtab
-  autocmd BufReadPost *
-    \ if line("'\"") > 0 && line("'\"") <= line("$") |
-    \  exe 'normal! g`"zvzz' |
-    \ endif
   autocmd WinEnter,BufWinEnter * set cursorline
   autocmd WinLeave * set nocursorline
 augroup END
@@ -222,7 +218,7 @@ nnoremap <space>f :call filefinder#start()<CR>
 "netrw
 let g:netrw_liststyle = 3
 let g:netrw_banner = 0
-let g:netrw_list_hide= '__pycache__,.*\.pyc$,.*\.swp,\.git,\.ropeproject,\.cache,build,\.egg-info,dist,\.DS_Store'
+let g:netrw_list_hide= '__pycache__,.*\.pyc$,.*\.swp,\.git,\.ropeproject,\.cache,build/,\.egg-info,dist,\.DS_Store'
 
 " cscope {{{
 let g:cscope_db_added = 0
