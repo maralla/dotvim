@@ -7,6 +7,7 @@ let s:just_open = v:true
 let s:dir = getcwd()
 let s:total = 0
 let s:min_height = 10
+let s:indent = printf('%*s', strchars(s:prompt_indicator), ' ')
 
 
 func filefinder#start() abort
@@ -48,13 +49,17 @@ func s:fetch_files(cwd)
 endfunc
 
 
+func s:indexed(file, index) abort
+  return s:indent . '#' . string(a:index) . '#' . a:file
+endfunc
+
+
 func s:on_data(ch) abort
   let s:files = []
   let i = 0
   try
     while ch_canread(a:ch)
-      let indent = printf('%*s', strchars(s:prompt_indicator), ' ')
-      call add(s:files, indent . '#'.string(i).'#'.ch_read(a:ch))
+      call add(s:files, s:indexed(ch_read(a:ch), i))
       let i += 1
     endwhile
     call s:put_content(s:files)
@@ -85,7 +90,6 @@ func s:put_content(content)
   call append(line('$'), a:content)
   let s:total = len(a:content)
   normal! ggdd
-  call s:set_syntax()
   if len(prompt) <= indicator_len
     call cursor(1, 10000)
   else
@@ -108,31 +112,78 @@ func s:set_syntax()
   syntax clear filefinderEndMatch
   syntax region filefinderMatch matchgroup=filefinderEndMatch start="\*\*" end="\*\*" concealends
   syntax match NONE "#\d\+#" conceal
-
-  nnoremap <expr> <buffer> <silent> <CR> filefinder#_open_file()
-  inoremap <expr> <buffer> <silent> <CR> filefinder#_open_file()
 endfunc
 
 
-func filefinder#_open_file()
-  let c = line('.')
-  if c == 1
-    let content = getline(2)
-  else
-    let content = getline(c)
-  endif
+func s:get_path(line)
   try
-    let [_, idx; _] = matchlist(content, '^\s*#\(\d\+\)#')
+    let [_, idx; _] = matchlist(a:line, '^\s*#\(\d\+\)#')
   catch /E688/
-    return ''
+    return [0, '']
   endtry
   let idx = str2nr(idx)
-  let action = ''
   if len(s:files) > idx
-    let path = s:dir . '/' . substitute(s:files[idx], '^\s*#\(\d\+\)#', '', '')
-    let action = "\<ESC>:" . winnr('#') . "wincmd w\<CR>:edit " . path . "\<CR>:" . winnr() . "wincmd c\<CR>"
+    return [idx, substitute(s:files[idx], '^\s*#\(\d\+\)#', '', '')]
   endif
-  return action
+  return [0, '']
+endfunc
+
+
+func s:get_current_path()
+  let c = line('.')
+  return s:get_path(c == 1 ? getline(2) : getline(c))
+endfunc
+
+
+func s:win_do(action)
+  return "\<ESC>:" . winnr('#') . "wincmd w\<CR>" . a:action . "\<CR>:" . winnr() . "wincmd c\<CR>"
+endfunc
+
+
+func filefinder#_new() abort
+  let c = line('.')
+  if c == 1
+    let dir = s:dir
+  else
+    let [_, subpath] = s:get_path(getline(c))
+    let dir = fnamemodify(s:dir . '/' . subpath, ':h')
+  endif
+  let path = input('Create file: ' . dir . '/')
+  return empty(path) ? '' : s:win_do(':edit ' . dir . '/' . path)
+endfunc
+
+
+func filefinder#_rename() abort
+  let [idx, subpath] = s:get_current_path()
+  if empty(subpath)
+    return ''
+  endif
+  let dir = s:dir . '/'
+  let res = input('Rename file: ' . dir, subpath)
+  if res != subpath && !empty(res)
+    call rename(dir . subpath, dir . res)
+    let s:files[idx] = s:indexed(res, idx)
+    return ":silent doautocmd TextChangedI\<CR>"
+  endif
+  return ''
+endfunc
+
+
+func filefinder#_delete() abort
+  let [idx, subpath] = s:get_current_path()
+  let path = s:dir . '/' . subpath
+  let res = input('Delete file: ' . path . ' (y/[n]) ')
+  if res ==? 'y' && delete(path) == 0
+    let s:files[idx] = ''
+    return ":silent doautocmd TextChangedI\<CR>"
+  endif
+  return ''
+endfunc
+
+
+func filefinder#_open_file() abort
+  let [_, subpath] = s:get_current_path()
+  return empty(subpath) ? '' : s:win_do(':edit ' . s:dir . '/' . subpath)
 endfunc
 
 
@@ -151,6 +202,7 @@ func s:open_finder() abort
   exe 'resize '. float2nr(round(0.4*&lines))
 endfunc
 
+
 func s:close_finder() abort
   let nr = bufwinnr(s:filename)
   if nr > 0
@@ -158,6 +210,7 @@ func s:close_finder() abort
     exe 'silent ' . nr . ' wincmd c'
   endif
 endfunc
+
 
 func s:init() abort
   setlocal bufhidden=hide
@@ -197,7 +250,12 @@ func s:init() abort
   nnoremap <silent> <buffer> i :startinsert<CR>
   nnoremap <silent> <buffer> A :startinsert!<CR>
   nnoremap <silent> <buffer> q :quit<CR>
-
+  nnoremap <expr> <buffer> <silent> <CR> filefinder#_open_file()
+  nnoremap <expr> <buffer> <silent> n filefinder#_new()
+  nnoremap <expr> <buffer> <silent> r filefinder#_rename()
+  nnoremap <expr> <buffer> <silent> D filefinder#_delete()
+  inoremap <expr> <buffer> <silent> <CR> filefinder#_open_file()
+  call s:set_syntax()
   augroup filefinder
     autocmd! * <buffer>
     autocmd InsertEnter <buffer> call s:on_insert_enter()
@@ -236,7 +294,7 @@ func s:on_text_changed()
   let filter_text = substitute(filter_text, '\*', '.*', 'g')
   let filtered = []
   if empty(filter_text)
-    let filtered = s:files
+    let filtered = filter(copy(s:files), '!empty(v:val)')
   else
     for entry in s:files
       if entry =~ filter_text
