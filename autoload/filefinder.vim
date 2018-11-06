@@ -15,10 +15,14 @@ func filefinder#start() abort
   if !s:inited
     call s:init()
   endif
-  let path = s:find_git()
-  call s:fetch_files(path)
   startinsert!
-  call s:put_content(['Loading...'])
+  if !empty(s:files)
+    call s:put_content(s:files)
+  else
+    let path = s:find_git()
+    call s:fetch_files(path)
+    call s:put_content([['Loading...', 0]])
+  endif
 endfunc
 
 
@@ -55,11 +59,10 @@ endfunc
 
 
 func s:on_data(ch) abort
-  let s:files = []
   let i = 0
   try
     while ch_canread(a:ch)
-      call add(s:files, s:indexed(ch_read(a:ch), i))
+      call add(s:files, [s:indexed(ch_read(a:ch), i), 0])
       let i += 1
     endwhile
     call s:put_content(s:files)
@@ -72,7 +75,12 @@ func s:on_data(ch) abort
 endfunc
 
 
-func s:put_content(content)
+func s:compare(x, y)
+  return a:x[1] == a:y[1] ? 0 : a:x[1] < a:y[1] ? 1 : -1
+endfunc
+
+
+func s:put_content(content) abort
   setlocal modifiable
   let pos = getpos('.')
   let prompt = getline(1)
@@ -86,9 +94,12 @@ func s:put_content(content)
     let prompt = s:prompt_indicator . substitute(prompt, '^'.s:prompt_indicator.'\?', '', '')
   endif
   normal! ggdG
+  let items = copy(a:content)
+  call sort(items, {x,y -> s:compare(x,y)})
+  call map(items, 'v:val[0]')
   call append(line('$'), [prompt])
-  call append(line('$'), a:content)
-  let s:total = len(a:content)
+  call append(line('$'), items)
+  let s:total = len(items)
   normal! ggdd
   if len(prompt) <= indicator_len
     call cursor(1, 10000)
@@ -123,7 +134,7 @@ func s:get_path(line)
   endtry
   let idx = str2nr(idx)
   if len(s:files) > idx
-    return [idx, substitute(s:files[idx], '^\s*#\(\d\+\)#', '', '')]
+    return [idx, substitute(s:files[idx][0], '^\s*#\(\d\+\)#', '', '')]
   endif
   return [0, '']
 endfunc
@@ -149,7 +160,14 @@ func filefinder#_new() abort
     let dir = fnamemodify(s:dir . '/' . subpath, ':h')
   endif
   let path = input('Create file: ' . dir . '/')
-  return empty(path) ? '' : s:win_do(':edit ' . dir . '/' . path)
+  if empty(path)
+    return ''
+  endif
+  let f = dir . '/' . path
+  if !filereadable(f)
+    call add(s:files, [s:indexed(f[len(s:dir)+1:], len(s:files)), 0])
+  endif
+  return s:win_do(':edit ' . f)
 endfunc
 
 
@@ -162,7 +180,7 @@ func filefinder#_rename() abort
   let res = input('Rename file: ' . dir, subpath)
   if res != subpath && !empty(res)
     call rename(dir . subpath, dir . res)
-    let s:files[idx] = s:indexed(res, idx)
+    let s:files[idx][0] = s:indexed(res, idx)
     return ":silent doautocmd TextChangedI\<CR>"
   endif
   return ''
@@ -173,8 +191,9 @@ func filefinder#_delete() abort
   let [idx, subpath] = s:get_current_path()
   let path = s:dir . '/' . subpath
   let res = input('Delete file: ' . path . ' (y/[n]) ')
-  if res ==? 'y' && delete(path) == 0
-    let s:files[idx] = ''
+  if res ==? 'y'
+    call delete(path)
+    let s:files[idx][0] = ''
     return ":silent doautocmd TextChangedI\<CR>"
   endif
   return ''
@@ -182,14 +201,17 @@ endfunc
 
 
 func filefinder#_open_file() abort
-  let [_, subpath] = s:get_current_path()
-  return empty(subpath) ? '' : s:win_do(':edit ' . s:dir . '/' . subpath)
+  let [idx, subpath] = s:get_current_path()
+  if empty(subpath)
+    return ''
+  endif
+  let s:files[idx][1] += 1
+  return s:win_do(':edit ' . s:dir . '/' . subpath)
 endfunc
 
 
 func s:open_finder() abort
   let s:just_open = v:true
-  let s:files = []
   let nr = bufwinnr(s:filename)
   if nr > 0
     exe 'silent ' . nr . ' wincmd w'
@@ -294,16 +316,16 @@ func s:on_text_changed()
   let filter_text = substitute(filter_text, '\*', '.*', 'g')
   let filtered = []
   if empty(filter_text)
-    let filtered = filter(copy(s:files), '!empty(v:val)')
+    let filtered = filter(copy(s:files), '!empty(v:val[0])')
   else
-    for entry in s:files
+    for [entry, weight] in s:files
       if entry =~ filter_text
         let idx = stridx(entry, '#', stridx(entry, '#')+1)
         if idx <= 0
           continue
         endif
         let f = substitute(entry[idx+1:], '\('.filter_text.'\)', '**\1**', 'g')
-        call add(filtered, entry[:idx].f)
+        call add(filtered, [entry[:idx].f, weight])
       endif
     endfor
   endif
