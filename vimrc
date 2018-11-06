@@ -105,9 +105,18 @@ set smartcase  " do case-sensitive if there's a capital letter
 set colorcolumn=80
 set signcolumn=yes
 
+func s:do_cmd(cmd)
+  exe a:cmd
+endfunc
+
+func s:delay_set(cmd)
+  call timer_start(16, {t -> s:do_cmd(a:cmd)})
+endfunc
+
 " Autocmds.
+call s:delay_set('autocmd BufNewFile,BufRead *.snippets setlocal filetype=snippets')
 augroup myvimrc
-  autocmd BufNewFile,BufRead *.h setfiletype c
+  autocmd BufNewFile,BufRead *.h set filetype=c
   autocmd FileType css,less,javascript,json,html,php,puppet,yaml,jinja,vim setlocal shiftwidth=2 tabstop=2 softtabstop=2
   autocmd FileType go setlocal noexpandtab
   autocmd WinEnter,BufWinEnter * set cursorline
@@ -499,18 +508,25 @@ augroup END "}}}
 
 " ********************************
 " colorscheme
-hi Constant guifg=#00897B
-hi Folded guifg=#616161 guibg=NONE
-hi Statement guifg=#43A047 cterm=bold
-hi PreProc guifg=#AD1457
-hi SpecialKey guifg=#3f4f54 guibg=#212121
-hi Normal guibg=#161616
-hi CursorLine guibg=#212121
-hi ColorColumn guibg=#212121
-hi MatchParen gui=bold guifg=#fdf6e3 guibg=NONE
-hi LineNr guibg=#212121
-hi CursorLineNr guibg=#212121 guifg=#839496
-hi DiffAdd guibg=#212121
-hi DiffChange guibg=#212121
-hi DiffDelete guibg=#212121
+hi   Constant       guifg=#00897B
+hi   Folded         guifg=#616161   guibg=NONE
+hi   Statement      guifg=#43A047   cterm=bold
+hi   PreProc        guifg=#AD1457
+hi   SpecialKey     guifg=#3f4f54   guibg=#212121
+hi   Normal         guibg=#161616
+hi   CursorLine     guibg=#212121
+hi   ColorColumn    guibg=#212121
+hi   MatchParen     gui=bold        guifg=#fdf6e3   guibg=NONE
+hi   LineNr         guibg=#212121
+hi   CursorLineNr   guibg=#212121   guifg=#839496
+hi   DiffAdd        guibg=#212121
+hi   DiffChange     guibg=#212121
+hi   DiffDelete     guibg=#212121
+hi   Type           guifg=#9d7041
+" ********************************
+
+
+" ********************************
+" abbreviate
+ab todo TODO
 " ********************************
