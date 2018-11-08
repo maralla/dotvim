@@ -1,19 +1,56 @@
 global !p
+import vim
 def is_upper(arg):
 	return arg and arg[0].isupper()
+
+def add_doc(token):
+	snip.rv = ''
+	if is_upper(token):
+		snip.rv = '// {} TODO add doc\n'.format(token)
+
+def get_binding_name(token):
+	t = token.strip('* ')
+	return t[0].lower() if t else ''
 endglobal
 
 snippet func "function" b
 `!p
 snip.rv = ""
 if is_upper(t[1]):
-	snip.rv = "// {} ...".format(t[1])
-`
-func ${1:myFunc}(${2:args}) {
+	snip.rv = "// {} ...\n".format(t[1])
+`func ${1:myFunc}(${2:args}) {
+}
+endsnippet
+
+snippet type "type" b
+`!p add_doc(t[1])
+`type ${1:Type} ${2:struct} {
+	$0
+}
+endsnippet
+
+snippet meth "bind function to struct" b
+`!p add_doc(t[1])
+`func (`!p snip.rv=get_binding_name(t[2])` ${2:Type}) ${1:method}(${4:args}) ${5:error} {
+	$0
 }
 endsnippet
 
 snippet pack "package" b
 package ${1:main}
 $2
+endsnippet
+
+snippet main "func main()" b
+`!p pack = 'package main'
+has_package = False
+for line in vim.current.buffer:
+    if line.startswith('package '):
+        has_package = True
+        break
+if not has_package:
+    snip.rv = pack + '\n\n'
+`func main() {
+	$0
+}
 endsnippet

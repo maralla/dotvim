@@ -323,7 +323,7 @@ function! s:status_ignore()
 endfunction
 
 function! StatusMode()
-  if s:status_ignore()
+  if s:status_ignore() || &readonly
     return ''
   endif
   let l:mode = mode()
@@ -376,7 +376,7 @@ function! StatusLineInfo()
   if s:status_ignore()
     return ''
   endif
-  let msg = printf('%-4d:%-3d', line('.'), col('.'))
+  let msg = printf('%d:%d', line('.'), col('.'))
   return " \u2b61 " . msg
 endfunction
 
