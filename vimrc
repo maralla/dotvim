@@ -508,21 +508,22 @@ augroup END "}}}
 
 " ********************************
 " colorscheme
-hi   Constant       guifg=#00897B
-hi   Folded         guifg=#616161   guibg=NONE
-hi   Statement      guifg=#43A047   cterm=bold
-hi   PreProc        guifg=#AD1457
-hi   SpecialKey     guifg=#3f4f54   guibg=#212121
-hi   Normal         guibg=#161616
-hi   CursorLine     guibg=#212121
-hi   ColorColumn    guibg=#212121
-hi   MatchParen     gui=bold        guifg=#fdf6e3   guibg=NONE
-hi   LineNr         guibg=#212121
-hi   CursorLineNr   guibg=#212121   guifg=#839496
-hi   DiffAdd        guibg=#212121
-hi   DiffChange     guibg=#212121
-hi   DiffDelete     guibg=#212121
-hi   Type           guifg=#9d7041
+hi Constant     guifg=#00897B
+hi Folded       guifg=#616161 guibg=NONE
+hi Statement    guifg=#43A047 cterm=bold
+hi PreProc      guifg=#AD1457
+hi SpecialKey   guifg=#3f4f54 guibg=#212121
+hi Normal       guibg=#161616 guifg=#6c7a7b
+hi Comment      guifg=#4e6168 gui=italic ctermfg=NONE ctermbg=NONE cterm=italic
+hi CursorLine   guibg=#212121
+hi ColorColumn  guibg=#212121
+hi MatchParen   gui=bold      guifg=#fdf6e3 guibg=NONE
+hi LineNr       guibg=#212121
+hi CursorLineNr guibg=#212121 guifg=#839496
+hi DiffAdd      guibg=#212121
+hi DiffChange   guibg=#212121
+hi DiffDelete   guibg=#212121
+hi Type         guifg=#9d7041
 " ********************************
 
 
