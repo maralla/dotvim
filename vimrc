@@ -4,7 +4,7 @@ set encoding=utf-8
 scriptencoding utf-8
 
 " utils {{{
-function! Preserve(command)
+func! Preserve(command)
   " preparation: save last search, and cursor position.
   let _s=@/
   let l = line('.')
@@ -14,17 +14,17 @@ function! Preserve(command)
   " clean up: restore previous search history, and cursor position
   let @/=_s
   call cursor(l, c)
-endfunction
+endfunc
 
-function! StripTrailingWhitespace()
+func! StripTrailingWhitespace()
   call Preserve("%s/\\s\\+$//e")
-endfunction
+endfunc
 
-function! EnsureExists(path)
+func! EnsureExists(path)
   if !isdirectory(expand(a:path))
     call mkdir(expand(a:path))
   endif
-endfunction
+endfunc
 " }}}
 
 if 0 | endif
@@ -105,11 +105,11 @@ set smartcase  " do case-sensitive if there's a capital letter
 set colorcolumn=80
 set signcolumn=yes
 
-func s:do_cmd(cmd)
+func! s:do_cmd(cmd)
   exe a:cmd
 endfunc
 
-func s:delay_set(cmd)
+func! s:delay_set(cmd)
   call timer_start(16, {t -> s:do_cmd(a:cmd)})
 endfunc
 
@@ -117,6 +117,7 @@ endfunc
 call s:delay_set('autocmd BufNewFile,BufRead *.snippets setlocal filetype=snippets')
 augroup myvimrc
   autocmd BufNewFile,BufRead *.h set filetype=c
+  autocmd BufReadPost * exe 'normal! g`"'
   autocmd FileType css,less,javascript,json,html,php,puppet,yaml,jinja,vim setlocal shiftwidth=2 tabstop=2 softtabstop=2
   autocmd FileType go setlocal noexpandtab
   autocmd WinEnter,BufWinEnter * set cursorline
@@ -209,7 +210,7 @@ nmap <leader>l :set list! list?<cr>
 " insert empty line
 nmap <leader><space> m`o<ESC>``
 
-function! s:get_selected()
+func! s:get_selected()
   try
     let bak = @a
     silent! normal! gv"ay
@@ -217,7 +218,7 @@ function! s:get_selected()
   finally
     let @a = bak
   endtry
-endfunction
+endfunc
 vnoremap * <ESC>:call setreg("/", <SID>get_selected())<CR>nN
 
 " file finder
@@ -231,7 +232,7 @@ let g:netrw_list_hide= '__pycache__,.*\.pyc$,.*\.swp,\.git,\.ropeproject,\.cache
 
 " cscope {{{
 let g:cscope_db_added = 0
-function! SetupCscope()
+func! SetupCscope()
   if has('cscope')
       set cscopetag
       set csto=0
@@ -266,22 +267,22 @@ function! SetupCscope()
 
       command! -nargs=* G :cs find g <args>
   endif
-endfunction
+endfunc
 
-function! CreateCscopeDB()
+func! CreateCscopeDB()
   if has('cscope')
     silent call system("find . -iname '*.c' -o -iname '*.h' -o -iname '*.cpp' > .cscope.files")
     silent call system('cscope -b -i .cscope.files -f .cscope.out')
     silent :cs reset
     redraw!
   endif
-endfunction
+endfunc
 
-function! UpdateCscopeDB()
+func! UpdateCscopeDB()
   if filereadable('.cscope.out')
     call CreateCscopeDB()
   endif
-endfunction
+endfunc
 
 " autocmd BufNewFile,BufRead *.c,*.h,*.cpp call SetupCscope()
 " autocmd BufNewFile,BufWritePost *.c,*.h,*.cpp call UpdateCscopeDB()
@@ -318,34 +319,34 @@ let s:mode_map = {
       \ '!':      '  SHELL  ',
       \ }
 
-function! s:status_ignore()
+func! s:status_ignore()
   return winwidth(0) <= s:min_status_width || &ft ==# 'netrw'
-endfunction
+endfunc
 
-function! StatusMode()
+func! StatusMode()
   if s:status_ignore() || &readonly
     return ''
   endif
   let l:mode = mode()
   return has_key(s:mode_map, l:mode) ? s:mode_map[l:mode] : ''
-endfunction
+endfunc
 
-function! StatusPaste()
+func! StatusPaste()
   if s:status_ignore()
     return ''
   endif
   return &paste ? ' PASTE ' : ''
-endfunction
+endfunc
 
-function! StatusBranch()
+func! StatusBranch()
   if s:status_ignore() || !exists('*fugitive#head')
     return ''
   endif
   let branch = fugitive#head()
   return empty(branch) ? '' : "   \uF020 " . branch
-endfunction
+endfunc
 
-function! StatusFilename()
+func! StatusFilename()
   let name = expand('%:t')
   let name = name !=# '' ? "\uf022 " . name : '[No Name]'
   if &ft ==# 'netrw'
@@ -355,47 +356,47 @@ function! StatusFilename()
   let ignore = s:status_ignore()
   let empty = ignore ? '  ' : '    '
   return empty . name
-endfunction
+endfunc
 
-function! StatusTag()
+func! StatusTag()
   if s:status_ignore() || !exists('*tagbar#currenttag')
     return ''
   endif
   let tag = tagbar#currenttag('%s', '', '')
   return empty(tag) ? '' : tag . '  '
-endfunction
+endfunc
 
-function! StatusFileType()
+func! StatusFileType()
   if s:status_ignore() || get(b:, 'statusline_hide_filetype', v:true)
     return ''
   endif
   return empty(&ft) ? '' : &ft . '   '
-endfunction
+endfunc
 
-function! StatusLineInfo()
+func! StatusLineInfo()
   if s:status_ignore()
     return ''
   endif
   let msg = printf('%d:%d', line('.'), col('.'))
   return " \u2b61 " . msg
-endfunction
+endfunc
 
-function! StatusTmux()
+func! StatusTmux()
   if s:status_ignore()
     return ''
   endif
   return $TERM =~? '^screen' && $TMUX !=? '' ? '   @tmux   ' : ''
-endfunction
+endfunc
 
-function! StatusValidator()
+func! StatusValidator()
   if s:status_ignore() || !exists('*validator#get_status_string')
     return ''
   endif
   return validator#get_status_string()
-endfunction
+endfunc
 
 
-function! s:hi(item, bg, ...)
+func! s:hi(item, bg, ...)
   let fg = ''
   let extra = ''
   if a:0 >= 2
@@ -407,7 +408,7 @@ function! s:hi(item, bg, ...)
   let guifg = empty(fg) ? '' : ' guifg=' . fg
   let extra = empty(extra) ? '' : ' ' . extra
   exe 'hi ' . a:item . guifg . ' guibg=' . a:bg . extra
-endfunction
+endfunc
 
 
 let s:color = {
@@ -425,7 +426,7 @@ let s:color = {
 "         \ }
 " endif
 
-function! s:hi_filename()
+func! s:hi_filename()
   if &modified
     call s:hi('StatusActiveFName', s:color.status_bg, s:color.fname_modified)
     call s:hi('StatusInactiveFName', s:color.status_bg, s:color.fname_modified)
@@ -438,13 +439,13 @@ function! s:hi_filename()
     hi link StatusActiveFName       StatusActiveMode
     hi link StatusInactiveFName     StatusActiveMode
   endif
-endfunction
+endfunc
 
 
 let s:status_ignored_types = ['unite', 'finder']
 
 
-function! s:set_highlight()
+func! s:set_highlight()
   call s:hi('StatusLine', s:color.status_bg, s:color.status_bg)
   call s:hi('StatusLineNC', s:color.status_bg, s:color.status_bg)
 
@@ -467,16 +468,16 @@ function! s:set_highlight()
   call s:hi('SignColumn', s:color.status_bg)
   call s:hi('ValidatorErrorSign', s:color.status_bg, '#C62828', 'cterm=bold')
   call s:hi('ValidatorWarningSign', s:color.status_bg, '#F9A825', 'cterm=bold')
-endfunction
+endfunc
 call s:set_highlight()
 
 
-function! StatusSpace()
+func! StatusSpace()
   return &ft ==# 'netrw' ? '' : '  '
-endfunction
+endfunc
 
 
-function! s:create_statusline(mode)
+func! s:create_statusline(mode)
   if index(s:status_ignored_types, &ft) >= 0
     return
   endif
@@ -498,7 +499,7 @@ function! s:create_statusline(mode)
     let parts = ['%{StatusSpace()}', '%#Status' .a:mode. 'FName#%{StatusFilename()}']
   endif
   exe 'setlocal statusline=' . join(parts, '')
-endfunction
+endfunc
 
 augroup mystatusline "{{{
   autocmd WinEnter,BufWinEnter * call s:create_statusline('Active')
@@ -510,7 +511,7 @@ augroup END "}}}
 " colorscheme
 hi Constant     guifg=#00897B
 hi Folded       guifg=#616161 guibg=NONE
-hi Statement    guifg=#43A047 cterm=bold
+hi Statement    guifg=#43A047
 hi PreProc      guifg=#AD1457
 hi SpecialKey   guifg=#3f4f54 guibg=#212121
 hi Normal       guibg=#161616 guifg=#6c7a7b

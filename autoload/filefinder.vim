@@ -10,7 +10,8 @@ let s:min_height = 10
 let s:indent = printf('%*s', strchars(s:prompt_indicator), ' ')
 
 
-func filefinder#start() abort
+func! filefinder#start() abort
+  pyx import vim
   call s:open_finder()
   if !s:inited
     call s:init()
@@ -26,7 +27,7 @@ func filefinder#start() abort
 endfunc
 
 
-func s:find_git()
+func! s:find_git()
   let cwd = getcwd()
   let p = cwd
   while v:true
@@ -41,7 +42,7 @@ func s:find_git()
 endfunc
 
 
-func s:fetch_files(cwd)
+func! s:fetch_files(cwd)
   if exists('s:job') && job_status(s:job) ==# 'run'
     call job_stop(s:job)
   endif
@@ -53,12 +54,12 @@ func s:fetch_files(cwd)
 endfunc
 
 
-func s:indexed(file, index) abort
+func! s:indexed(file, index) abort
   return s:indent . '#' . string(a:index) . '#' . a:file
 endfunc
 
 
-func s:on_data(ch) abort
+func! s:on_data(ch) abort
   let i = 0
   try
     while ch_canread(a:ch)
@@ -75,12 +76,12 @@ func s:on_data(ch) abort
 endfunc
 
 
-func s:compare(x, y)
+func! s:compare(x, y)
   return a:x[1] == a:y[1] ? 0 : a:x[1] < a:y[1] ? 1 : -1
 endfunc
 
 
-func s:put_content(content) abort
+func! s:put_content(content) abort
   setlocal modifiable
   let pos = getpos('.')
   let prompt = getline(1)
@@ -93,14 +94,16 @@ func s:put_content(content) abort
   elseif pos[2] - 1 <= indicator_len
     let prompt = s:prompt_indicator . substitute(prompt, '^'.s:prompt_indicator.'\?', '', '')
   endif
-  normal! ggdG
+  " normal! ggdG
+  pyx vim.current.buffer[:] = []
   let items = copy(a:content)
-  call sort(items, {x,y -> s:compare(x,y)})
+  call sort(items, 's:compare')
   call map(items, 'v:val[0]')
   call append(line('$'), [prompt])
   call append(line('$'), items)
   let s:total = len(items)
-  normal! ggdd
+  " normal! ggdd
+  pyx del vim.current.buffer[0]
   if len(prompt) <= indicator_len
     call cursor(1, 10000)
   else
@@ -109,11 +112,10 @@ func s:put_content(content) abort
     endif
     call setpos('.', pos)
   endif
-  redraw!
 endfunc
 
 
-func s:set_syntax()
+func! s:set_syntax()
   hi filefinderCount guifg=#FF8F00 guibg=#212121
   hi filefinderDir guifg=#795548 guibg=#212121
 
@@ -126,7 +128,7 @@ func s:set_syntax()
 endfunc
 
 
-func s:get_path(line)
+func! s:get_path(line)
   try
     let [_, idx; _] = matchlist(a:line, '^\s*#\(\d\+\)#')
   catch /E688/
@@ -140,18 +142,18 @@ func s:get_path(line)
 endfunc
 
 
-func s:get_current_path()
+func! s:get_current_path()
   let c = line('.')
   return s:get_path(c == 1 ? getline(2) : getline(c))
 endfunc
 
 
-func s:win_do(action)
+func! s:win_do(action)
   return "\<ESC>:" . winnr('#') . "wincmd w\<CR>" . a:action . "\<CR>:" . winnr() . "wincmd c\<CR>"
 endfunc
 
 
-func filefinder#_new() abort
+func! filefinder#_new() abort
   let c = line('.')
   if c == 1
     let dir = s:dir
@@ -171,7 +173,7 @@ func filefinder#_new() abort
 endfunc
 
 
-func filefinder#_rename() abort
+func! filefinder#_rename() abort
   let [idx, subpath] = s:get_current_path()
   if empty(subpath)
     return ''
@@ -187,7 +189,7 @@ func filefinder#_rename() abort
 endfunc
 
 
-func filefinder#_delete() abort
+func! filefinder#_delete() abort
   let [idx, subpath] = s:get_current_path()
   let path = s:dir . '/' . subpath
   let res = input('Delete file: ' . path . ' (y/[n]) ')
@@ -200,7 +202,7 @@ func filefinder#_delete() abort
 endfunc
 
 
-func filefinder#_open_file() abort
+func! filefinder#_open_file() abort
   let [idx, subpath] = s:get_current_path()
   if empty(subpath)
     return ''
@@ -210,7 +212,7 @@ func filefinder#_open_file() abort
 endfunc
 
 
-func s:open_finder() abort
+func! s:open_finder() abort
   let s:just_open = v:true
   let nr = bufwinnr(s:filename)
   if nr > 0
@@ -225,7 +227,7 @@ func s:open_finder() abort
 endfunc
 
 
-func s:close_finder() abort
+func! s:close_finder() abort
   let nr = bufwinnr(s:filename)
   if nr > 0
     call feedkeys("\<ESC>")
@@ -234,7 +236,7 @@ func s:close_finder() abort
 endfunc
 
 
-func s:init() abort
+func! s:init() abort
   setlocal bufhidden=hide
   setlocal buftype=nofile
   setlocal nolist
@@ -288,7 +290,7 @@ func s:init() abort
 endfunc
 
 
-func s:on_insert_enter()
+func! s:on_insert_enter()
   setlocal modifiable
   let prompt = getline(1)
   let current_line = line('.')
@@ -302,15 +304,12 @@ func s:on_insert_enter()
 endfunc
 
 
-func s:on_insert_leave()
+func! s:on_insert_leave()
   setlocal nomodifiable
 endfunc
 
 
-func s:on_text_changed()
-  if empty(s:files)
-    return
-  endif
+func! s:refresh_content()
   let prompt = getline(1)
   let filter_text = escape(substitute(prompt, '^'.s:prompt_indicator.'\?', '', ''), '.')
   let filter_text = substitute(filter_text, '\*', '.*', 'g')
@@ -333,7 +332,18 @@ func s:on_text_changed()
 endfunc
 
 
-func s:setup_statusline()
+func! s:on_text_changed()
+  if empty(s:files)
+    return
+  endif
+  if exists('s:timer')
+    call timer_stop(s:timer)
+  endif
+  let timer = timer_start(200, {t -> s:refresh_content()})
+endfunc
+
+
+func! s:setup_statusline()
   let parts = [
         \ '%#filefinderCount#%{filefinder#_count()}',
         \ '%=',
@@ -343,11 +353,11 @@ func s:setup_statusline()
 endfunc
 
 
-func filefinder#_count()
+func! filefinder#_count()
   return '   ' . (line('.') - 1) . '/' . s:total
 endfunc
 
 
-func filefinder#_dir()
+func! filefinder#_dir()
   return s:dir . '  '
 endfunc
