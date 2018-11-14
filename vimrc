@@ -105,16 +105,19 @@ set smartcase  " do case-sensitive if there's a capital letter
 set colorcolumn=80
 set signcolumn=yes
 
-func! s:do_cmd(cmd)
-  exe a:cmd
+func! s:set_snippets_type()
+  if &ft ==? 'neosnippet'
+    setlocal ft=snippets
+  endif
 endfunc
 
-func! s:delay_set(cmd)
-  call timer_start(16, {t -> s:do_cmd(a:cmd)})
+func! s:delay_set(fn)
+  call timer_start(16, a:fn)
 endfunc
+
+call s:delay_set({->s:set_snippets_type()})
 
 " Autocmds.
-call s:delay_set('autocmd BufNewFile,BufRead *.snippets setlocal filetype=snippets')
 augroup myvimrc
   autocmd BufNewFile,BufRead *.h set filetype=c
   autocmd BufReadPost * exe 'normal! g`"'
@@ -378,14 +381,14 @@ func! StatusLineInfo()
     return ''
   endif
   let msg = printf('%d:%d', line('.'), col('.'))
-  return " \u2b61 " . msg
+  return " \u2b61 " . msg . '  '
 endfunc
 
 func! StatusTmux()
   if s:status_ignore()
     return ''
   endif
-  return $TERM =~? '^screen' && $TMUX !=? '' ? '   @tmux   ' : ''
+  return $TMUX !=? '' ? '   @tmux   ' : ''
 endfunc
 
 func! StatusValidator()

@@ -310,6 +310,9 @@ endfunc
 
 
 func! s:refresh_content()
+  if bufwinid(s:filename) == -1
+    return
+  endif
   let prompt = getline(1)
   let filter_text = escape(substitute(prompt, '^'.s:prompt_indicator.'\?', '', ''), '.')
   let filter_text = substitute(filter_text, '\*', '.*', 'g')

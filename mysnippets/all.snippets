@@ -1,3 +1,7 @@
+global !p
+from vimsnippets import get_comment_format
+endglobal
+
 snippet MIT "The MIT License" b
 The MIT License (MIT)
 
@@ -20,4 +24,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+endsnippet
+
+snippet todo "TODO"
+`!p snip.rv=get_comment_format()[0]`TODO: $0
 endsnippet
