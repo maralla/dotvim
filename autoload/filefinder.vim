@@ -1,28 +1,34 @@
-let s:files = []
+let s:files = {}
 let s:prompt_indicator = '» '
 let s:position = 'topleft'
-let s:filename = '_@@_finder_@@_'
+let s:filename = '__finder__'
 let s:inited = v:false
 let s:just_open = v:true
 let s:dir = getcwd()
 let s:total = 0
 let s:min_height = 10
-let s:indent = printf('%*s', strchars(s:prompt_indicator), ' ')
+let s:indent_len = strchars(s:prompt_indicator)
+let s:indent = printf('%*s', s:indent_len, ' ')
 
 
 func! filefinder#start() abort
   pyx import vim
   call s:open_finder()
+  call s:fetch()
   if !s:inited
     call s:init()
   endif
+endfunc
+
+
+func! s:fetch() abort
   startinsert!
   if !empty(s:files)
     call s:put_content(s:files)
   else
     let path = s:find_git()
-    call s:fetch_files(path)
-    call s:put_content([['Loading...', 0]])
+    call s:fetch_files(path, v:false)
+    call s:put_content({'Loading...': 0})
   endif
 endfunc
 
@@ -42,42 +48,57 @@ func! s:find_git()
 endfunc
 
 
-func! s:fetch_files(cwd)
+func! s:start_fetcher()
+  call timer_start(10000, {t->s:fetch_files(s:dir, v:true)}, {'repeat': -1})
+endfunc
+
+
+func! s:fetch_files(cwd, by_fetcher)
   if exists('s:job') && job_status(s:job) ==# 'run'
     call job_stop(s:job)
   endif
   let s:dir = a:cwd
   let s:job = job_start(['fd', '-t=f'], {
-        \ 'close_cb': {c->s:on_data(c)},
+        \ 'close_cb': {c->s:on_data(c, a:by_fetcher)},
         \ 'cwd': a:cwd,
         \ })
 endfunc
 
 
-func! s:indexed(file, index) abort
-  return s:indent . '#' . string(a:index) . '#' . a:file
-endfunc
-
-
-func! s:on_data(ch) abort
-  let i = 0
+func! s:on_data(ch, by_fetcher) abort
+  let nr = bufwinnr(s:filename)
   try
     while ch_canread(a:ch)
-      call add(s:files, [s:indexed(ch_read(a:ch), i), 0])
-      let i += 1
+      let f = ch_read(a:ch)
+      if has_key(s:files, f)
+        let weight = s:files[f]
+      else
+        let weight = 0
+      endif
+      let s:files[f] = weight
     endwhile
-    call s:put_content(s:files)
+    if !a:by_fetcher
+      call s:put_content(s:files)
+    endif
   catch /E906/
-    call s:close_finder()
-    echohl Error
-    echo 'Fail to run finder'
-    echohl None
+    if !a:by_fetcher
+      call s:close_finder()
+      echohl Error
+      echo 'Fail to run finder'
+      echohl None
+    endif
   endtry
 endfunc
 
 
 func! s:compare(x, y)
-  return a:x[1] == a:y[1] ? 0 : a:x[1] < a:y[1] ? 1 : -1
+  if a:x[1] == a:y[1]
+    return a:x[0] == a:y[0] ? 0 : a:x[0] > a:y[0] ? 1 : -1
+  elseif a:x[1] < a:y[1]
+    return 1
+  else
+    return -1
+  endif
 endfunc
 
 
@@ -96,12 +117,12 @@ func! s:put_content(content) abort
   endif
   " normal! ggdG
   pyx vim.current.buffer[:] = []
-  let items = copy(a:content)
-  call sort(items, 's:compare')
-  call map(items, 'v:val[0]')
+  let rows = items(a:content)
+  call sort(rows, 's:compare')
+  call map(rows, 's:indent . v:val[0]')
   call append(line('$'), [prompt])
-  call append(line('$'), items)
-  let s:total = len(items)
+  call append(line('$'), rows)
+  let s:total = len(rows)
   " normal! ggdd
   pyx del vim.current.buffer[0]
   if len(prompt) <= indicator_len
@@ -129,16 +150,11 @@ endfunc
 
 
 func! s:get_path(line)
-  try
-    let [_, idx; _] = matchlist(a:line, '^\s*#\(\d\+\)#')
-  catch /E688/
-    return [0, '']
-  endtry
-  let idx = str2nr(idx)
-  if len(s:files) > idx
-    return [idx, substitute(s:files[idx][0], '^\s*#\(\d\+\)#', '', '')]
+  let row = substitute(a:line, '\*\*\([^*]*\)\*\*', '\1', 'g')
+  if len(row) > s:indent_len
+    return row[s:indent_len:]
   endif
-  return [0, '']
+  return ''
 endfunc
 
 
@@ -158,23 +174,24 @@ func! filefinder#_new() abort
   if c == 1
     let dir = s:dir
   else
-    let [_, subpath] = s:get_path(getline(c))
+    let subpath = s:get_path(getline(c))
     let dir = fnamemodify(s:dir . '/' . subpath, ':h')
   endif
   let path = input('Create file: ' . dir . '/')
   if empty(path)
     return ''
   endif
-  let f = dir . '/' . path
-  if !filereadable(f)
-    call add(s:files, [s:indexed(f[len(s:dir)+1:], len(s:files)), 0])
+  let f = dir.'/'.path
+  let suffix = f[len(s:dir)+1:]
+  if !has_key(s:files, suffix)
+    let s:files[suffix] = 0
   endif
   return s:win_do(':edit ' . f)
 endfunc
 
 
 func! filefinder#_rename() abort
-  let [idx, subpath] = s:get_current_path()
+  let subpath = s:get_current_path()
   if empty(subpath)
     return ''
   endif
@@ -182,7 +199,10 @@ func! filefinder#_rename() abort
   let res = input('Rename file: ' . dir, subpath)
   if res != subpath && !empty(res)
     call rename(dir . subpath, dir . res)
-    let s:files[idx][0] = s:indexed(res, idx)
+    call remove(s:files, subpath)
+    if !has_key(s:files, res)
+      let s:files[res] = 0
+    endif
     return ":silent doautocmd TextChangedI\<CR>"
   endif
   return ''
@@ -190,12 +210,12 @@ endfunc
 
 
 func! filefinder#_delete() abort
-  let [idx, subpath] = s:get_current_path()
+  let subpath = s:get_current_path()
   let path = s:dir . '/' . subpath
   let res = input('Delete file: ' . path . ' (y/[n]) ')
   if res ==? 'y'
     call delete(path)
-    let s:files[idx][0] = ''
+    call remove(s:files, subpath)
     return ":silent doautocmd TextChangedI\<CR>"
   endif
   return ''
@@ -203,11 +223,11 @@ endfunc
 
 
 func! filefinder#_open_file() abort
-  let [idx, subpath] = s:get_current_path()
+  let subpath = s:get_current_path()
   if empty(subpath)
     return ''
   endif
-  let s:files[idx][1] += 1
+  let s:files[subpath] += 1
   return s:win_do(':edit ' . s:dir . '/' . subpath)
 endfunc
 
@@ -274,11 +294,13 @@ func! s:init() abort
   nnoremap <silent> <buffer> i :startinsert<CR>
   nnoremap <silent> <buffer> A :startinsert!<CR>
   nnoremap <silent> <buffer> q :quit<CR>
-  nnoremap <expr> <buffer> <silent> <CR> filefinder#_open_file()
-  nnoremap <expr> <buffer> <silent> n filefinder#_new()
-  nnoremap <expr> <buffer> <silent> r filefinder#_rename()
-  nnoremap <expr> <buffer> <silent> D filefinder#_delete()
-  inoremap <expr> <buffer> <silent> <CR> filefinder#_open_file()
+  nnoremap <silent> <buffer> / <nop>
+  nnoremap <silent> <buffer> ? <nop>
+  nnoremap <expr> <silent> <buffer> <CR> filefinder#_open_file()
+  nnoremap <expr> <silent> <buffer> n filefinder#_new()
+  nnoremap <expr> <silent> <buffer> r filefinder#_rename()
+  nnoremap <expr> <silent> <buffer> D filefinder#_delete()
+  inoremap <expr> <silent> <buffer> <CR> filefinder#_open_file()
   call s:set_syntax()
   augroup filefinder
     autocmd! * <buffer>
@@ -286,6 +308,7 @@ func! s:init() abort
     autocmd InsertLeave <buffer> call s:on_insert_leave()
     autocmd TextChangedI <buffer> call s:on_text_changed()
   augroup END
+  call s:start_fetcher()
   let s:inited = v:true
 endfunc
 
@@ -316,18 +339,14 @@ func! s:refresh_content()
   let prompt = getline(1)
   let filter_text = escape(substitute(prompt, '^'.s:prompt_indicator.'\?', '', ''), '.')
   let filter_text = substitute(filter_text, '\*', '.*', 'g')
-  let filtered = []
+  let filtered = {}
   if empty(filter_text)
-    let filtered = filter(copy(s:files), '!empty(v:val[0])')
+    let filtered = s:files
   else
-    for [entry, weight] in s:files
+    for [entry, weight] in items(s:files)
       if entry =~ filter_text
-        let idx = stridx(entry, '#', stridx(entry, '#')+1)
-        if idx <= 0
-          continue
-        endif
-        let f = substitute(entry[idx+1:], '\('.filter_text.'\)', '**\1**', 'g')
-        call add(filtered, [entry[:idx].f, weight])
+        let f = substitute(entry, '\('.filter_text.'\)', '**\1**', 'g')
+        let filtered[f] = weight
       endif
     endfor
   endif

@@ -3,7 +3,7 @@ let g:completor_disable_filename = 0
 let g:completor_disable_buffer = 0
 let g:completor_clang_binary = '/usr/bin/clang'
 let g:completor_css_omni_trigger = '([\w-]+|@[\w-]*|[\w-]+:\s*[\w-]*)$'
-let g:completor_html_omni_trigger = '<?[a-z].*$'
+let g:completor_html_omni_trigger = '<?.*$'
 let g:completor_php_omni_trigger = '([$\w]+|use\s*|->[$\w]*|::[$\w]*|implements\s*|extends\s*|class\s+[$\w]+|new\s*)$'
 let g:completor_tex_omni_trigger = '\\\\(:?'
         \ .  '\w*cite\w*(?:\s*\[[^]]*\]){0,2}\s*{[^}]*'
