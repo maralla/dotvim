@@ -1,3 +1,5 @@
+scriptencoding utf8
+
 let s:files = {}
 let s:prompt_indicator = '» '
 let s:position = 'topleft'
@@ -9,6 +11,7 @@ let s:total = 0
 let s:min_height = 10
 let s:indent_len = strchars(s:prompt_indicator)
 let s:indent = printf('%*s', s:indent_len, ' ')
+let s:timer = -1
 
 
 func! filefinder#start() abort
@@ -41,7 +44,7 @@ func! s:find_git()
       return p
     endif
     let p = fnamemodify(p, ':h')
-    if p == '/'
+    if p ==# '/'
       return cwd
     endif
   endwhile
@@ -152,7 +155,7 @@ endfunc
 func! s:get_path(line)
   let row = substitute(a:line, '\*\*\([^*]*\)\*\*', '\1', 'g')
   if len(row) > s:indent_len
-    return row[s:indent_len:]
+    return row[s:indent_len :]
   endif
   return ''
 endfunc
@@ -358,7 +361,8 @@ func! s:on_text_changed()
   if empty(s:files)
     return
   endif
-  if exists('s:timer')
+  " -1 means no timer created.
+  if s:timer != -1
     call timer_stop(s:timer)
   endif
   let timer = timer_start(200, {t -> s:refresh_content()})

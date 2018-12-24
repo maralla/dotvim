@@ -273,6 +273,11 @@
 - 
   category: default
   local: false
+  name: ternjs/tern_for_vim
+  opt: false
+- 
+  category: default
+  local: false
   name: "terryma/vim-expand-region"
   opt: false
 - 

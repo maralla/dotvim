@@ -105,6 +105,8 @@ set smartcase  " do case-sensitive if there's a capital letter
 set colorcolumn=80
 set signcolumn=yes
 
+packadd matchit
+
 func! s:set_snippets_type()
   if &ft ==? 'neosnippet'
     setlocal ft=snippets
@@ -115,10 +117,9 @@ func! s:delay_set(fn)
   call timer_start(16, a:fn)
 endfunc
 
-call s:delay_set({->s:set_snippets_type()})
-
 " Autocmds.
 augroup myvimrc
+  autocmd BufNewFile,BufRead *.snippets call s:delay_set({->s:set_snippets_type()})
   autocmd BufNewFile,BufRead *.h set filetype=c
   autocmd BufReadPost * try | exe 'normal! g`"' | catch /E19/ | endtry
   autocmd FileType css,less,javascript,json,html,php,puppet,yaml,jinja,vim setlocal shiftwidth=2 tabstop=2 softtabstop=2
@@ -535,3 +536,5 @@ hi Type         guifg=#9d7041
 " abbreviate
 ab todo TODO
 " ********************************
+"
+set cot=menuone,longest,preview

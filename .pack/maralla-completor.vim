@@ -17,7 +17,7 @@ let g:completor_tex_omni_trigger = '\\\\(:?'
         \ .')$'
 " let g:completor_cpp_omni_trigger = ''
 
-" let g:completor_auto_trigger = 0
+let g:completor_auto_trigger = 1
 " inoremap <expr> <c-n> pumvisible() ? "<C-N>" : "<C-R>=completor#do('complete')<CR>"
 
 " inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
