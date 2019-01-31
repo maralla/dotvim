@@ -38,7 +38,7 @@ syntax enable
 set termguicolors
 let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
 let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
-colorscheme solarized8_dark
+colorscheme solarized8
 
 set timeoutlen=300                              " mapping timeout
 set ttimeoutlen=50                              " keycode timeout
@@ -122,7 +122,7 @@ augroup myvimrc
   autocmd BufNewFile,BufRead *.snippets call s:delay_set({->s:set_snippets_type()})
   autocmd BufNewFile,BufRead *.h set filetype=c
   autocmd BufReadPost * try | exe 'normal! g`"' | catch /E19/ | endtry
-  autocmd FileType css,less,javascript,json,html,php,puppet,yaml,jinja,vim setlocal shiftwidth=2 tabstop=2 softtabstop=2
+  autocmd FileType css,less,javascript,json,html,puppet,yaml,jinja,vim,vue setlocal shiftwidth=2 tabstop=2 softtabstop=2
   autocmd FileType go setlocal noexpandtab
   autocmd WinEnter,BufWinEnter * set cursorline
   autocmd WinLeave * set nocursorline
