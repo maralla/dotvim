@@ -35,6 +35,8 @@ let g:completor_go_gofmt_binary = 'goimports'
 map <c-\> <Plug>CompletorCppJumpToPlaceholder
 imap <c-\> <Plug>CompletorCppJumpToPlaceholder
 
+" let g:completor_lsp_go_server = 'gopls serve'
+
 augroup completor_config
   autocmd!
   autocmd BufWritePost *.go :call completor#do('format')
