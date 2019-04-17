@@ -124,8 +124,8 @@ augroup myvimrc
   autocmd BufReadPost * try | exe 'normal! g`"' | catch /E19/ | endtry
   autocmd FileType css,less,javascript,json,html,puppet,yaml,jinja,vim,vue setlocal shiftwidth=2 tabstop=2 softtabstop=2
   autocmd FileType go setlocal noexpandtab
-  autocmd WinEnter,BufWinEnter * set cursorline
-  autocmd WinLeave * set nocursorline
+  autocmd WinEnter,BufWinEnter * if &ft != '__margin__' | set cursorline | endif
+  autocmd WinLeave * if &ft != '__margin__' | set nocursorline | endif
 augroup END
 
 
@@ -446,7 +446,7 @@ func! s:hi_filename()
 endfunc
 
 
-let s:status_ignored_types = ['unite', 'finder']
+let s:status_ignored_types = ['unite', 'finder', '__margin__']
 
 
 func! s:set_highlight()
