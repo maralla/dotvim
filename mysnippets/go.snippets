@@ -1,5 +1,6 @@
 global !p
 import vim
+import os.path
 def is_upper(arg):
 	return arg and arg[0].isupper()
 
@@ -37,7 +38,8 @@ snippet meth "bind function to struct" b
 endsnippet
 
 snippet pack "package" b
-package ${1:main}
+package ${1:`!v expand('%:p:h:t')`}
+
 $2
 endsnippet
 

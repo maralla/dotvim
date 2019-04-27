@@ -46,7 +46,12 @@ set mousehide                                   " hide when characters are typed
 set history=1000                                " number of command lines to remember
 set ttyfast                                     " assume fast terminal connection
 set viewoptions=folds,options,cursor,unix,slash " unix/windows compatibility
-set clipboard=unnamed                           " sync with OS clipboard
+" sync with OS clipboard
+if has('linux')
+  set clipboard=unnamedplus
+else
+  set clipboard=unnamed
+endif
 set hidden                                      " allow buffer switching without saving
 set autoread                                    " auto reload if file saved externally
 set fileformats+=mac                            " add mac to auto-detection of file format line endings
@@ -513,10 +518,14 @@ augroup END "}}}
 
 " ********************************
 " colorscheme
-hi Constant     guifg=#00897B
+hi Constant     guifg=#82976F
 hi Folded       guifg=#616161 guibg=NONE
-hi Statement    guifg=#43A047
-hi PreProc      guifg=#AD1457
+hi Statement    guifg=#5E81AC
+hi Search       guibg=#484848 term=NONE cterm=bold gui=NONE guifg=NONE
+hi IncSearch    guibg=#484848 term=NONE cterm=bold gui=NONE guifg=NONE
+hi Identifier   guifg=#81A1C1
+hi PreProc      guifg=#9E7D98
+hi Special      guifg=#B37460
 hi SpecialKey   guifg=#3f4f54 guibg=#212121
 hi Normal       guibg=#161616 guifg=#6c7a7b
 hi Comment      guifg=#4e6168 gui=italic ctermfg=NONE ctermbg=NONE cterm=italic
@@ -528,7 +537,8 @@ hi CursorLineNr guibg=#212121 guifg=#839496
 hi DiffAdd      guibg=#212121
 hi DiffChange   guibg=#212121
 hi DiffDelete   guibg=#212121
-hi Type         guifg=#9d7041
+hi Type         guifg=#A38D61
+hi Visual       guibg=#484848 term=NONE cterm=NONE gui=NONE guifg=NONE
 " ********************************
 
 
