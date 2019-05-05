@@ -521,16 +521,17 @@ augroup END "}}}
 hi Constant     guifg=#82976F
 hi Folded       guifg=#616161 guibg=NONE
 hi Statement    guifg=#5E81AC
-hi Search       guibg=#484848 term=NONE cterm=bold gui=NONE guifg=NONE
-hi IncSearch    guibg=#484848 term=NONE cterm=bold gui=NONE guifg=NONE
+hi Search       guibg=#292E38 term=NONE cterm=bold gui=NONE guifg=NONE
+hi IncSearch    guibg=#292E38 term=NONE cterm=bold gui=NONE guifg=NONE
+hi Visual       guibg=#292E38 term=NONE cterm=NONE gui=NONE guifg=NONE
 hi Identifier   guifg=#81A1C1
 hi PreProc      guifg=#9E7D98
 hi Special      guifg=#B37460
-hi SpecialKey   guifg=#3f4f54 guibg=#212121
-hi Normal       guibg=#161616 guifg=#6c7a7b
-hi Comment      guifg=#4e6168 gui=italic ctermfg=NONE ctermbg=NONE cterm=italic
-hi CursorLine   guibg=#212121
-hi ColorColumn  guibg=#212121
+hi SpecialKey   guifg=#3f4f54 guibg=#191919
+hi Normal       guibg=#161616 guifg=#81848A
+hi Comment      guifg=#41495A gui=italic ctermfg=NONE ctermbg=NONE cterm=italic
+hi CursorLine   guibg=#191919
+hi ColorColumn  guibg=#191919
 hi MatchParen   gui=bold      guifg=#fdf6e3 guibg=NONE
 hi LineNr       guibg=#212121
 hi CursorLineNr guibg=#212121 guifg=#839496
@@ -538,7 +539,7 @@ hi DiffAdd      guibg=#212121
 hi DiffChange   guibg=#212121
 hi DiffDelete   guibg=#212121
 hi Type         guifg=#A38D61
-hi Visual       guibg=#484848 term=NONE cterm=NONE gui=NONE guifg=NONE
+hi VertSplit    guibg=#212121 guifg=#212121
 " ********************************
 
 

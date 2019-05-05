@@ -26,6 +26,7 @@ let g:completor_auto_trigger = 1
 noremap <silent> <leader>d :call completor#do('definition')<CR>
 noremap <silent> <leader>c :call completor#do('doc')<CR>
 noremap <silent> <leader>f :call completor#do('format')<CR>
+noremap <silent> <leader>h :call completor#do('hover')<CR>
 " let g:completor_javascript_omni_trigger = "\\w+$|[\\w\\)\\]\\}\'\"]+\\.\\w*$"
 let g:completor_set_options = 1
 let g:completor_auto_close_doc = 1
@@ -35,7 +36,11 @@ let g:completor_go_gofmt_binary = 'goimports'
 map <c-\> <Plug>CompletorCppJumpToPlaceholder
 imap <c-\> <Plug>CompletorCppJumpToPlaceholder
 
-" let g:completor_lsp_go_server = 'gopls serve'
+let g:completor_filetype_map = {
+      \ 'go':   {'ft': 'lsp', 'cmd': 'gopls'},
+      \ 'rust': {'ft': 'lsp', 'cmd': 'rls'},
+      \ 'c':    {'ft': 'lsp', 'cmd': 'clangd-7'},
+      \ }
 
 augroup completor_config
   autocmd!
