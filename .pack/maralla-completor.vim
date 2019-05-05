@@ -26,7 +26,7 @@ let g:completor_auto_trigger = 1
 noremap <silent> <leader>d :call completor#do('definition')<CR>
 noremap <silent> <leader>c :call completor#do('doc')<CR>
 noremap <silent> <leader>f :call completor#do('format')<CR>
-noremap <silent> <leader>h :call completor#do('hover')<CR>
+noremap <silent> <leader>s :call completor#do('hover')<CR>
 " let g:completor_javascript_omni_trigger = "\\w+$|[\\w\\)\\]\\}\'\"]+\\.\\w*$"
 let g:completor_set_options = 1
 let g:completor_auto_close_doc = 1
