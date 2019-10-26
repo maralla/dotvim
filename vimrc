@@ -544,6 +544,8 @@ hi Pmenu        cterm=NONE gui=NONE guibg=#252525 guifg=#696C70
 hi PmenuSel     cterm=NONE gui=NONE guibg=#343638 guifg=NONE
 hi PmenuSbar    cterm=NONE gui=NONE guibg=#343638 guifg=NONE
 hi PmenuThumb   cterm=NONE gui=NONE guibg=#515457 guifg=NONE
+
+hi rustCommentLineDoc guifg=#714E41
 " ********************************
 
 

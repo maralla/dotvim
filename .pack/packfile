@@ -184,6 +184,11 @@
   name: maralla/completor.vim
   opt: false
 - 
+  category: lang
+  local: false
+  name: maralla/gomod.vim
+  opt: false
+- 
   category: default
   local: false
   name: maralla/mycolor

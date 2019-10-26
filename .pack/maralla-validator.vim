@@ -9,3 +9,8 @@ let g:validator_debug = 0
 let g:validator_go_checkers = ['golangci-lint']
 let g:validator_highlight_message = 1
 " let g:validator_ignore = ['go']
+
+let g:validator_use_popup_window = 1
+
+hi ValidatorPopupColor guifg=#643333
+hi ValidatorBorderColor guifg=#161616
