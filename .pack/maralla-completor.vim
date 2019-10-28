@@ -37,12 +37,14 @@ map <c-\> <Plug>CompletorCppJumpToPlaceholder
 imap <c-\> <Plug>CompletorCppJumpToPlaceholder
 
 let g:completor_filetype_map = {}
+let g:completor_filetype_map.javascript = {'ft': 'lsp', 'cmd': '/home/maralla/Workspace/tmp/node/node_modules/.bin/flow lsp'}
 " Enable lsp for go by using gopls
 let g:completor_filetype_map.go = {'ft': 'lsp', 'cmd': 'gopls'}
 " Enable lsp for rust by using rls
 let g:completor_filetype_map.rust = {'ft': 'lsp', 'cmd': 'rls'}
 " Enable lsp for c by using clangd
-let g:completor_filetype_map.c = {'ft': 'lsp', 'cmd': 'clangd-7'}
+" let g:completor_filetype_map.c = {'ft': 'lsp', 'cmd': 'clangd-7'}
+let g:completor_filetype_map.c = {'ft': 'lsp', 'cmd': '/home/maralla/Workspace/src/ccls/Release/ccls'}
 
 augroup completor_config
   autocmd!

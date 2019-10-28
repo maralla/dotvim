@@ -158,9 +158,15 @@ call EnsureExists(&undodir)
 call EnsureExists(&backupdir)
 call EnsureExists(&directory)
 
+" Cursor shape config.
 if exists('$TMUX')
-  let &t_SI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=1\x7\<Esc>\\"
-  let &t_EI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=0\x7\<Esc>\\"
+  if has('linux')
+    let &t_SI = "\<ESC>[6 q"
+    let &t_EI = "\<ESC>[0 q"
+  else
+    let &t_SI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=1\x7\<Esc>\\"
+    let &t_EI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=0\x7\<Esc>\\"
+  endif
 else
   let &t_SI = "\<Esc>]50;CursorShape=1\x7"
   let &t_EI = "\<Esc>]50;CursorShape=0\x7"
@@ -527,7 +533,7 @@ hi Visual       guibg=#292E38 term=NONE cterm=NONE gui=NONE guifg=NONE
 hi Identifier   guifg=#81A1C1
 hi PreProc      guifg=#9E7D98
 hi Special      guifg=#B37460
-hi SpecialKey   guifg=#3f4f54 guibg=#191919
+hi SpecialKey   guifg=#212a2d guibg=#191919
 hi Normal       guibg=#161616 guifg=#81848A
 hi Comment      guifg=#41495A gui=italic ctermfg=NONE ctermbg=NONE cterm=italic
 hi CursorLine   guibg=#191919

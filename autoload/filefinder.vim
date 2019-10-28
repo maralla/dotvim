@@ -61,7 +61,7 @@ func! s:fetch_files(cwd, by_fetcher)
     call job_stop(s:job)
   endif
   let s:dir = a:cwd
-  let s:job = job_start(['fd', '-t=f'], {
+  let s:job = job_start(['fd', '-t=f', '-H', '-E', '.git'], {
         \ 'close_cb': {c->s:on_data(c, a:by_fetcher)},
         \ 'cwd': a:cwd,
         \ })

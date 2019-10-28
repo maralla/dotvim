@@ -16,6 +16,11 @@
 - 
   category: default
   local: false
+  name: "Shougo/neco-vim"
+  opt: false
+- 
+  category: default
+  local: false
   name: "Shougo/neosnippet-snippets"
   opt: false
 - 
@@ -50,9 +55,19 @@
   name: "cakebaker/scss-syntax.vim"
   opt: false
 - 
+  category: default
+  local: false
+  name: "cespare/vim-go-templates"
+  opt: false
+- 
   category: lang
   local: false
   name: "cespare/vim-toml"
+  opt: false
+- 
+  category: default
+  local: false
+  name: chr4/nginx.vim
   opt: false
 - 
   category: default
@@ -134,6 +149,11 @@
   name: "justinmk/vim-syntax-extra"
   opt: false
 - 
+  category: default
+  local: false
+  name: "jvirtanen/vim-hcl"
+  opt: false
+- 
   category: lang
   local: false
   name: "kchmck/vim-coffee-script"
@@ -147,6 +167,11 @@
   category: default
   local: false
   name: ksauzz/thrift.vim
+  opt: false
+- 
+  category: default
+  local: false
+  name: "kyouryuukunn/completor-necovim"
   opt: false
 - 
   category: lang
