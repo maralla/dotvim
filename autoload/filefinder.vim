@@ -125,7 +125,7 @@ endfunc
 func s:execute(cwd, options, filter, render)
   let s:dir = a:cwd
   let max_count = get(g:, 'finder_max_files', 100)
-  let cmd = ['fd'] + a:options + [a:filter, '|', 'rg', '--json', '--max-count', max_count, a:filter]
+  let cmd = ['fd', '-p'] + a:options + [a:filter, '|', 'rg', '--json', '--max-count', max_count, a:filter]
   let s:job = job_start(['/bin/sh', '-c', join(cmd, ' ')], #{
         \ close_cb: {c->s:render_result(c, a:render)},
         \ cwd: a:cwd,
