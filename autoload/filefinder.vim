@@ -17,21 +17,8 @@ let s:timer = -1
 func! filefinder#start() abort
   pyx import vim
   call s:open_finder()
-  call s:fetch()
   if !s:inited
     call s:init()
-  endif
-endfunc
-
-
-func! s:fetch() abort
-  startinsert!
-  if !empty(s:files)
-    call s:put_content(s:files)
-  else
-    let path = s:find_git()
-    call s:fetch_files(path, v:false)
-    call s:put_content({'Loading...': 0})
   endif
 endfunc
 
@@ -51,20 +38,149 @@ func! s:find_git()
 endfunc
 
 
-func! s:start_fetcher()
-  call timer_start(10000, {t->s:fetch_files(s:dir, v:true)}, {'repeat': -1})
+func s:render_prompt(cmd)
+  let data = s:prompt_indicator
+  if a:cmd != ""
+    let data .= a:cmd
+  endif
+  call setline(1, [data])
+  call feedkeys("\<ESC>ggA")
 endfunc
 
 
-func! s:fetch_files(cwd, by_fetcher)
+func s:refresh()
+  let size = len(s:prompt_indicator)
+  let cmdline = getline(1)
+  if cmdline[:size-1] != s:prompt_indicator
+    let cmdline = s:prompt_indicator
+  endif
+  let cmd = cmdline[size:]
+  call s:reset()
+  call s:render_prompt(cmd)
+  call s:delayed_find(cmd, function('s:render_pane'))
+endfunc
+
+
+func s:reset()
+  pyx vim.current.buffer[:] = []
+endfunc
+
+
+func s:delayed_find(cmd, render)
+  if s:timer != -1
+    call timer_stop(s:timer)
+  endif
+  let s:timer = timer_start(200, {t -> s:find(a:cmd, a:render)})
+endfunc
+
+
+func s:find(cmd, render)
   if exists('s:job') && job_status(s:job) ==# 'run'
     call job_stop(s:job)
   endif
+  let cmd = trim(a:cmd)
+  if cmd == ""
+    return
+  endif
+  if cmd[0] != '+'
+    let cmd = '+. ' . cmd
+  endif
+  let parts = split(cmd, '\s\+')
+  if len(parts) == 1
+    let args = '+.'
+    let filter = cmd
+  else
+    let args = parts[0]
+    let filter = trim(cmd[len(args):])
+  endif
+  let [options, dir] = s:parse_args(args)
+  if filter == ''
+    return
+  endif
+  call s:execute(dir, options, filter, a:render)
+endfunc
+
+
+func s:parse_args(args)
+  let options = ['--type=f']
+  let sub = ''
+  if a:args[1] == 'a'
+    let options = options + ['--no-ignore', '--hidden']
+    let sub = a:args[2:]
+  elseif a:args[1] == 'h'
+    let options = options + ['--hidden']
+    let sub = a:args[2:]
+  else
+    let sub = a:args[1:]
+  endif
+  if sub =~ '^/'
+    let dir = sub
+  else
+    let dir = s:find_git() . '/' . sub
+  endif
+  return [options, dir]
+endfunc
+
+
+func s:execute(cwd, options, filter, render)
   let s:dir = a:cwd
-  let s:job = job_start(['fd', '-t=f', '-H', '-E', '.git'], {
-        \ 'close_cb': {c->s:on_data(c, a:by_fetcher)},
-        \ 'cwd': a:cwd,
+  let max_count = get(g:, 'finder_max_files', 100)
+  let cmd = ['fd'] + a:options + [a:filter, '|', 'rg', '--json', '--max-count', max_count, a:filter]
+  let s:job = job_start(['/bin/sh', '-c', join(cmd, ' ')], #{
+        \ close_cb: {c->s:render_result(c, a:render)},
+        \ cwd: a:cwd,
         \ })
+endfunc
+
+
+func s:render_result(ch, render) abort
+  let data = []
+  while ch_canread(a:ch)
+    try
+      let f = ch_read(a:ch)
+    catch /E906/
+      return
+    endtry
+    let item = json_decode(f)
+    if item.type != 'match'
+      continue
+    endif
+    let data = add(data, #{
+          \ text: trim(item.data.lines.text),
+          \ matches: item.data.submatches,
+          \ })
+  endwhile
+  let s:total = 0
+  call a:render(data)
+endfunc
+
+
+func s:render_pane(data)
+  let pad = strdisplaywidth(s:prompt_indicator)
+  for item in a:data
+    let s:total += 1
+    call append(line('$'), repeat(' ', pad) . item.text)
+    for m in item.matches
+      call prop_add(line('$'), m.start+1+pad, #{
+            \ length: m.end - m.start,
+            \ type: 'finder_matches',
+            \ })
+    endfor
+  endfor
+endfunc
+
+
+func s:init_props()
+  hi default link finderMatches Identifier
+  call prop_type_add('finder_matches', #{
+        \ highlight: 'finderMatches',
+        \ })
+  hi default finderCursorPosition guibg=#3A484C
+  call prop_type_add('finder_cursor', #{
+        \ highlight: 'finderCursorPosition',
+        \ })
+  hi default finderPrompt guibg=#1C2325
+  hi default finderPromptSplitter guifg=#2E393C guibg=#1C2325
 endfunc
 
 
@@ -142,13 +258,6 @@ endfunc
 func! s:set_syntax()
   hi filefinderCount guifg=#FF8F00 guibg=#212121
   hi filefinderDir guifg=#795548 guibg=#212121
-
-  hi default link filefinderMatch Identifier
-  hi default link filefinderEndMatch NONE
-  syntax clear filefinderMatch
-  syntax clear filefinderEndMatch
-  syntax region filefinderMatch matchgroup=filefinderEndMatch start="\*\*" end="\*\*" concealends
-  syntax match NONE "#\d\+#" conceal
 endfunc
 
 
@@ -163,7 +272,8 @@ endfunc
 
 func! s:get_current_path()
   let c = line('.')
-  return s:get_path(c == 1 ? getline(2) : getline(c))
+  let path = c == 1 ? getline(2) : getline(c)
+  return trim(path)
 endfunc
 
 
@@ -230,7 +340,7 @@ func! filefinder#_open_file() abort
   if empty(subpath)
     return ''
   endif
-  let s:files[subpath] += 1
+  " let s:files[subpath] += 1
   return s:win_do(':edit ' . s:dir . '/' . subpath)
 endfunc
 
@@ -247,6 +357,12 @@ func! s:open_finder() abort
   endif
   call s:setup_statusline()
   exe 'resize '. float2nr(round(0.4*&lines))
+  let s:total = 0
+  let s:dir = '.'
+  setlocal modifiable
+  call s:reset()
+  call s:render_prompt('')
+  setlocal nomodifiable
 endfunc
 
 
@@ -311,7 +427,7 @@ func! s:init() abort
     autocmd InsertLeave <buffer> call s:on_insert_leave()
     autocmd TextChangedI <buffer> call s:on_text_changed()
   augroup END
-  call s:start_fetcher()
+  call s:init_props()
   let s:inited = v:true
 endfunc
 
@@ -335,37 +451,8 @@ func! s:on_insert_leave()
 endfunc
 
 
-func! s:refresh_content()
-  if bufwinid(s:filename) == -1
-    return
-  endif
-  let prompt = getline(1)
-  let filter_text = escape(substitute(prompt, '^'.s:prompt_indicator.'\?', '', ''), '.')
-  let filter_text = substitute(filter_text, '\*', '.*', 'g')
-  let filtered = {}
-  if empty(filter_text)
-    let filtered = s:files
-  else
-    for [entry, weight] in items(s:files)
-      if entry =~ filter_text
-        let f = substitute(entry, '\('.filter_text.'\)', '**\1**', 'g')
-        let filtered[f] = weight
-      endif
-    endfor
-  endif
-  call s:put_content(filtered)
-endfunc
-
-
 func! s:on_text_changed()
-  if empty(s:files)
-    return
-  endif
-  " -1 means no timer created.
-  if s:timer != -1
-    call timer_stop(s:timer)
-  endif
-  let timer = timer_start(200, {t -> s:refresh_content()})
+  call s:refresh()
 endfunc
 
 
@@ -386,4 +473,225 @@ endfunc
 
 func! filefinder#_dir()
   return s:dir . '  '
+endfunc
+
+
+
+
+
+" Experiments
+
+
+let s:prompt_popup_pos = 1
+func s:prompt_popup_forward(max)
+  if s:prompt_popup_pos < a:max
+    let s:prompt_popup_pos += 1
+  endif
+endfunc
+
+func s:prompt_popup_backward()
+    if s:prompt_popup_pos > 1
+      let s:prompt_popup_pos -= 1
+    endif
+endfunc
+
+func s:prompt_popup_insert(text, key)
+  let end = s:prompt_popup_pos - 2
+  if end < 0
+    let prefix = ''
+  else
+    let prefix = a:text[:end]
+  endif
+  return prefix . a:key . a:text[s:prompt_popup_pos-1:]
+endfunc
+
+func s:prompt_popup_delete(text)
+  let p = s:prompt_popup_pos - 2
+  if p < 0
+    return a:text
+  endif
+  if p == 0
+    let prefix = ''
+  else
+    let prefix = a:text[:p-1]
+  endif
+  return prefix . a:text[p+1:]
+endfunc
+
+func s:prompt_filter(id, key)
+  let nr = winbufnr(a:id)
+  let content = getbufline(nr, 1)
+  if len(content) <= 0
+    let text = ''
+  else
+    let text = content[0]
+  endif
+  let move = v:false
+  if a:key == "\<BS>"
+    let text = s:prompt_popup_delete(text)
+    call s:prompt_popup_backward()
+  elseif a:key == "\<ESC>"
+    call s:prompt_popup_close()
+    call s:info_popup_close()
+    return 1
+  elseif a:key == "\<CR>"
+    call s:popup_open_file()
+    return 1
+  elseif a:key == "\<DOWN>" || a:key == "\<C-j>" || a:key == "\<C-n>"
+    call s:info_popup_do("normal! j")
+    return 1
+  elseif a:key == "\<UP>" || a:key == "\<C-k>" || a:key == "\<C-p>"
+    call s:info_popup_do("normal! k")
+    return 1
+  elseif a:key == "\<LEFT>" || a:key == "\<C-h>"
+    call s:prompt_popup_do(a:id, "normal! h")
+    call s:prompt_popup_backward()
+    let move = v:true
+  elseif a:key == "\<RIGHT>" || a:key == "\<C-l>"
+    call s:prompt_popup_do(a:id, "normal! l")
+    call s:prompt_popup_forward(strlen(text))
+    let move = v:true
+  elseif a:key !~ '\p'
+    return 1
+  else
+    let text = s:prompt_popup_insert(text, a:key)
+    call s:prompt_popup_forward(strlen(text))
+  endif
+  call prop_remove(#{id: s:prop_id_cursor, bufnr: nr, all: v:true}, 1)
+  if !move
+    call s:info_popup_close()
+    call setbufline(nr, 1, text)
+  endif
+  call prop_add(1, s:prompt_popup_pos, #{
+        \ length: 1,
+        \ bufnr: nr,
+        \ id: s:prop_id_cursor,
+        \ type: 'finder_cursor'
+        \ })
+  if !move
+    call s:delayed_find(trim(text), function('s:render_popup'))
+  endif
+  return 1
+endfunc
+
+func s:prompt_popup_close()
+  if s:prompt_popup != -1
+    call popup_close(s:prompt_popup)
+    set cursorline
+    exe 'set t_ve='.s:t_ve
+    let s:prompt_popup = -1
+  endif
+endfunc
+
+
+func s:prompt_popup_do(id, cmd)
+  call win_execute(a:id, a:cmd)
+endfunc
+
+
+let s:prop_id_cursor = 1
+
+let s:t_ve = &t_ve
+
+let s:prompt_popup = -1
+let s:inited = v:false
+func filefinder#create_prompt()
+  if !s:inited
+    call s:init_props()
+    let s:inited = v:true
+  endif
+  set nocursorline
+  set t_ve=
+  let s:prompt_popup = popup_create(' ', #{
+        \ line: 2,
+        \ padding: [1, 1, 1, 1],
+        \ minwidth: &columns*3/5,
+        \ maxwidth: &columns*3/5,
+        \ minheight: 1,
+        \ maxheight: 1,
+        \ mapping: v:false,
+        \ highlight: 'finderPrompt',
+        \ filter: function('s:prompt_filter'),
+        \ })
+  let nr = winbufnr(s:prompt_popup)
+  let s:prompt_popup_pos = 1
+  call prop_add(1, s:prompt_popup_pos, #{
+        \ length: 1,
+        \ bufnr: nr,
+        \ id: s:prop_id_cursor,
+        \ type: 'finder_cursor',
+        \ })
+endfunc
+
+
+func s:info_popup_getline()
+  if s:info_popup == -1
+    return ""
+  endif
+  let nr = winbufnr(s:info_popup)
+  let info = getbufinfo(nr)
+  let content = getbufline(nr, info[0].signs[0].lnum)
+  return content[0]
+endfunc
+
+
+func s:info_popup_close()
+  if s:info_popup != -1
+    call popup_close(s:info_popup)
+    let s:info_popup = -1
+  endif
+endfunc
+
+
+func s:info_popup_do(cmd)
+  if s:info_popup == -1
+    return
+  endif
+  call win_execute(s:info_popup, a:cmd)
+endfunc
+
+
+let s:info_popup = -1
+func s:render_popup(data)
+  call s:info_popup_close()
+  if len(a:data) <= 0
+    return
+  endif
+  let s:info_popup = popup_create(a:data, #{
+        \ line: 5,
+        \ padding: [1, 1, 1, 1],
+        \ minwidth: &columns*3/5,
+        \ maxwidth: &columns*3/5,
+        \ border: [1, 0, 0, 0],
+        \ borderchars: ['‾'],
+        \ cursorline: 1,
+        \ scrollbar: 0,
+        \ mapping: v:false,
+        \ highlight: 'finderPrompt',
+        \ borderhighlight: ['finderPromptSplitter'],
+        \ })
+  let nr = winbufnr(s:info_popup)
+  let i = 1
+  for item in a:data
+    for m in item.matches
+      call prop_add(i, m.start+1, #{
+            \ length: m.end - m.start,
+            \ type: 'finder_matches',
+            \ bufnr: nr,
+            \ })
+    endfor
+    let i += 1
+  endfor
+endfunc
+
+
+func s:popup_open_file()
+  let line = s:info_popup_getline()
+  if line == ""
+    return
+  endif
+  call s:prompt_popup_close()
+  call s:info_popup_close()
+  let file = s:dir . '/' . line
+  call feedkeys("\<ESC>:" . winnr('$') . "wincmd w\<CR>:edit " . file . "\<CR>")
 endfunc

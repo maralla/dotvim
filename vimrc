@@ -171,7 +171,7 @@ else
   let &t_SI = "\<Esc>]50;CursorShape=1\x7"
   let &t_EI = "\<Esc>]50;CursorShape=0\x7"
 endif
-"}}}
+" }}}
 
 
 " mappings {{{
@@ -237,7 +237,7 @@ endfunc
 vnoremap * <ESC>:call setreg("/", <SID>get_selected())<CR>nN
 
 " file finder
-nnoremap <space>f :call filefinder#start()<CR>
+nnoremap <space>f :call filefinder#create_prompt()<CR>
 "}}}
 
 "netrw
