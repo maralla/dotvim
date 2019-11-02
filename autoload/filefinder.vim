@@ -593,6 +593,7 @@ let s:prop_id_cursor = 1
 
 let s:t_ve = &t_ve
 
+let s:last_winnr = -1
 let s:prompt_popup = -1
 let s:inited = v:false
 func filefinder#create_prompt()
@@ -600,6 +601,7 @@ func filefinder#create_prompt()
     call s:init_props()
     let s:inited = v:true
   endif
+  let s:last_winnr = winnr()
   set nocursorline
   set t_ve=
   let s:prompt_popup = popup_create(' ', #{
@@ -693,5 +695,5 @@ func s:popup_open_file()
   call s:prompt_popup_close()
   call s:info_popup_close()
   let file = s:dir . '/' . line
-  call feedkeys("\<ESC>:" . winnr('$') . "wincmd w\<CR>:edit " . file . "\<CR>")
+  call feedkeys("\<ESC>:" . s:last_winnr . "wincmd w\<CR>:edit " . file . "\<CR>")
 endfunc
