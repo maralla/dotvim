@@ -179,8 +179,9 @@ func s:init_props()
   call prop_type_add('finder_cursor', #{
         \ highlight: 'finderCursorPosition',
         \ })
-  hi default finderPrompt guibg=#1C2325
+  hi default finderPrompt guibg=#161616
   hi default finderPromptSplitter guifg=#2E393C guibg=#1C2325
+  hi default finderPromptBorder guifg=#63787A guibg=#161616
 endfunc
 
 
@@ -606,13 +607,16 @@ func filefinder#create_prompt()
   set t_ve=
   let s:prompt_popup = popup_create(' ', #{
         \ line: 2,
-        \ padding: [1, 1, 1, 1],
+        \ padding: [0, 1, 0, 1],
         \ minwidth: &columns*3/5,
         \ maxwidth: &columns*3/5,
         \ minheight: 1,
         \ maxheight: 1,
         \ mapping: v:false,
         \ highlight: 'finderPrompt',
+        \ border: [1, 1, 1, 1],
+        \ borderchars: ['─', '│', '─', '│', '┌', '┐', '┘', '└'],
+        \ borderhighlight: ['finderPromptBorder'],
         \ filter: function('s:prompt_filter'),
         \ })
   let nr = winbufnr(s:prompt_popup)
@@ -642,6 +646,11 @@ func s:info_popup_close()
     call popup_close(s:info_popup)
     let s:info_popup = -1
   endif
+  if s:prompt_popup != -1
+    call popup_setoptions(s:prompt_popup, #{
+          \ borderchars: ['─', '│', '─', '│', '┌', '┐', '┘', '└'],
+          \ })
+  endif
 endfunc
 
 
@@ -664,13 +673,16 @@ func s:render_popup(data)
         \ padding: [1, 1, 1, 1],
         \ minwidth: &columns*3/5,
         \ maxwidth: &columns*3/5,
-        \ border: [1, 0, 0, 0],
-        \ borderchars: ['‾'],
+        \ border: [0, 1, 1, 1],
+        \ borderchars: ['─', '│', '─', '│', '╭', '┐', '┘', '└'],
         \ cursorline: 1,
         \ scrollbar: 0,
         \ mapping: v:false,
         \ highlight: 'finderPrompt',
-        \ borderhighlight: ['finderPromptSplitter'],
+        \ borderhighlight: ['finderPromptBorder'],
+        \ })
+  call popup_setoptions(s:prompt_popup, #{
+        \ borderchars: ['─', '│', '─', '│', '┌', '┐', '┤', '├'],
         \ })
   let nr = winbufnr(s:info_popup)
   let i = 1
