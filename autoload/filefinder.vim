@@ -519,6 +519,20 @@ func s:prompt_popup_delete(text)
   return prefix . a:text[p+1:]
 endfunc
 
+func s:prompt_stop_move(input)
+  if s:action !=# 'rename' && s:action !=# 'new'
+    return v:false
+  endif
+  let text = a:input[:s:prompt_popup_pos-2]
+  call Log(string(text))
+  return text =~ '^+\p $'
+endfunc
+
+func s:is_action()
+  return s:action != ''
+endfunc
+
+let s:action = ''
 func s:prompt_filter(id, key)
   let nr = winbufnr(a:id)
   let content = getbufline(nr, 1)
@@ -528,15 +542,44 @@ func s:prompt_filter(id, key)
     let text = content[0]
   endif
   let move = v:false
+  let render = !s:is_action()
   if a:key == "\<BS>"
+    if s:prompt_stop_move(text)
+      return 1
+    endif
     let text = s:prompt_popup_delete(text)
     call s:prompt_popup_backward()
   elseif a:key == "\<ESC>"
     call s:prompt_popup_close()
     call s:info_popup_close()
+    let s:action = ''
     return 1
+  elseif a:key == "\<C-r>"
+    if s:action == 'rename'
+      return 1
+    endif
+    let f = s:popup_start_rename_file()
+    if f == ''
+      return 1
+    endif
+    let text = f . ' '
+    let s:prompt_popup_pos = strlen(text)
+    let render = v:false
+  elseif a:key == "\<C-f>"
+    if s:action == 'new'
+      return 1
+    endif
+    let text = s:popup_start_new_file() . ' '
+    let s:prompt_popup_pos = strlen(text)
+    let render = v:false
   elseif a:key == "\<CR>"
-    call s:popup_open_file()
+    if s:action == 'rename'
+      call s:popup_rename_file()
+    elseif s:action == 'new'
+      call s:popup_new_file()
+    else
+      call s:popup_open_file()
+    endif
     return 1
   elseif a:key == "\<DOWN>" || a:key == "\<C-j>" || a:key == "\<C-n>"
     call s:info_popup_do("normal! j")
@@ -545,13 +588,18 @@ func s:prompt_filter(id, key)
     call s:info_popup_do("normal! k")
     return 1
   elseif a:key == "\<LEFT>" || a:key == "\<C-h>"
+    if s:prompt_stop_move(text)
+      return 1
+    endif
     call s:prompt_popup_do(a:id, "normal! h")
     call s:prompt_popup_backward()
     let move = v:true
+    let render = v:false
   elseif a:key == "\<RIGHT>" || a:key == "\<C-l>"
     call s:prompt_popup_do(a:id, "normal! l")
     call s:prompt_popup_forward(strlen(text))
     let move = v:true
+    let render = v:false
   elseif a:key !~ '\p'
     return 1
   else
@@ -569,7 +617,7 @@ func s:prompt_filter(id, key)
         \ id: s:prop_id_cursor,
         \ type: 'finder_cursor'
         \ })
-  if !move
+  if render
     call s:delayed_find(trim(text), function('s:render_popup'))
   endif
   return 1
@@ -582,6 +630,39 @@ func s:prompt_popup_close()
     exe 'set t_ve='.s:t_ve
     let s:prompt_popup = -1
   endif
+endfunc
+
+
+func s:prompt_popup_set_title(title)
+  if s:prompt_popup == -1
+    return
+  endif
+  call popup_setoptions(s:prompt_popup, #{title: a:title, padding: [1, 1, 1, 1]})
+endfunc
+
+
+func s:prompt_popup_settext(cmd, text)
+  if s:prompt_popup == -1
+    return
+  endif
+  let prefix = (a:cmd == '') ? '' : a:cmd . ' '
+  let text = prefix . a:text . ' '
+  let s:prompt_popup_pos = strlen(text)
+  call popup_settext(s:prompt_popup, text)
+  call prop_add(1, s:prompt_popup_pos, #{
+        \ length: 1,
+        \ bufnr: winnr(s:prompt_popup),
+        \ id: s:prop_id_cursor,
+        \ type: 'finder_cursor'
+        \ })
+endfunc
+
+
+func s:prompt_popup_gettext()
+  if s:prompt_popup == -1
+    return ''
+  endif
+  return trim(getbufline(winbufnr(s:prompt_popup), 1)[0])
 endfunc
 
 
@@ -700,6 +781,7 @@ endfunc
 
 
 func s:popup_open_file()
+  let s:action = 'open'
   let line = s:info_popup_getline()
   if line == ""
     return
@@ -708,4 +790,55 @@ func s:popup_open_file()
   call s:info_popup_close()
   let file = s:dir . '/' . line
   call feedkeys("\<ESC>:" . s:last_winnr . "wincmd w\<CR>:edit " . file . "\<CR>")
+endfunc
+
+
+func s:popup_start_rename_file()
+  let line = s:info_popup_getline()
+  if trim(line) == ''
+    return ''
+  endif
+  let s:action = 'rename'
+  call s:prompt_popup_set_title(' RENAME')
+  let s:rename_from = line
+  return '+: ' . line
+endfunc
+
+
+func s:popup_rename_file()
+  let p = s:prompt_popup_gettext()
+  if p =~ '^+: ' && s:rename_from != ''
+    let to = trim(p[2:])
+    if to != ''
+      let d = s:dir . '/'
+      call rename(d . s:rename_from, d . to)
+    endif
+  endif
+  call s:prompt_popup_close()
+  let s:action = ''
+endfunc
+
+
+func s:popup_start_new_file()
+  let s:action = 'new'
+  call s:prompt_popup_set_title(' NEW')
+  let line = s:info_popup_getline()
+  return '+: ' . fnamemodify(line, ':h')
+endfunc
+
+
+func s:popup_new_file()
+  let p = s:prompt_popup_gettext()
+  if p =~ '^+: '
+    let name = trim(p[2:])
+    call Log(string([p, name]))
+    if name != '' && name != '.' && name != '..'
+      call Log(string(name))
+      call s:prompt_popup_close()
+      call feedkeys("\<ESC>:" . s:last_winnr . "wincmd w\<CR>:edit " . name . "\<CR>")
+      return
+    endif
+  endif
+  call s:prompt_popup_close()
+  let s:action = ''
 endfunc
