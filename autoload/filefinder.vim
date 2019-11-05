@@ -520,13 +520,21 @@ func s:prompt_popup_delete(text)
 endfunc
 
 func s:prompt_stop_move(input)
+  if s:action ==# 'remove'
+    return v:true
+  endif
   if s:action !=# 'rename' && s:action !=# 'new'
     return v:false
   endif
   let text = a:input[:s:prompt_popup_pos-2]
-  call Log(string(text))
   return text =~ '^+\p $'
 endfunc
+
+
+func s:prompt_stop_all(key)
+  return s:action ==# 'remove' && a:key != "\<CR>" && a:key != "\<ESC>"
+endfunc
+
 
 func s:is_action()
   return s:action != ''
@@ -534,6 +542,9 @@ endfunc
 
 let s:action = ''
 func s:prompt_filter(id, key)
+  if s:prompt_stop_all(a:key)
+    return 1
+  endif
   let nr = winbufnr(a:id)
   let content = getbufline(nr, 1)
   if len(content) <= 0
@@ -572,11 +583,20 @@ func s:prompt_filter(id, key)
     let text = s:popup_start_new_file() . ' '
     let s:prompt_popup_pos = strlen(text)
     let render = v:false
+  elseif a:key == "\<C-d>"
+    if s:action == 'remove'
+      return 1
+    endif
+    let text = s:popup_start_remove_file() . ' '
+    let s:prompt_popup_pos = strlen(text)
+    let render = v:false
   elseif a:key == "\<CR>"
     if s:action == 'rename'
       call s:popup_rename_file()
     elseif s:action == 'new'
       call s:popup_new_file()
+    elseif s:action == 'remove'
+      call s:popup_remove_file()
     else
       call s:popup_open_file()
     endif
@@ -823,7 +843,7 @@ func s:popup_start_new_file()
   let s:action = 'new'
   call s:prompt_popup_set_title(' NEW')
   let line = s:info_popup_getline()
-  return '+: ' . fnamemodify(line, ':h')
+  return '+: ' . fnamemodify(line, ':h') . '/'
 endfunc
 
 
@@ -831,12 +851,35 @@ func s:popup_new_file()
   let p = s:prompt_popup_gettext()
   if p =~ '^+: '
     let name = trim(p[2:])
-    call Log(string([p, name]))
     if name != '' && name != '.' && name != '..'
-      call Log(string(name))
       call s:prompt_popup_close()
+      let s:action = ''
       call feedkeys("\<ESC>:" . s:last_winnr . "wincmd w\<CR>:edit " . name . "\<CR>")
       return
+    endif
+  endif
+  call s:prompt_popup_close()
+  let s:action = ''
+endfunc
+
+
+func s:popup_start_remove_file()
+  let line = s:info_popup_getline()
+  if trim(line) == ''
+    return ''
+  endif
+  let s:action = 'remove'
+  call s:prompt_popup_set_title(' REMOVE')
+  return '+: ' . line
+endfunc
+
+
+func s:popup_remove_file()
+  let p = s:prompt_popup_gettext()
+  if p =~ '^+: '
+    let name = trim(p[2:])
+    if name != ''
+      call delete(name)
     endif
   endif
   call s:prompt_popup_close()
