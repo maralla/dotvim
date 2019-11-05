@@ -801,7 +801,6 @@ endfunc
 
 
 func s:popup_open_file()
-  let s:action = 'open'
   let line = s:info_popup_getline()
   if line == ""
     return
