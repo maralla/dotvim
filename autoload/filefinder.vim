@@ -851,7 +851,12 @@ func s:popup_new_file()
   if p =~ '^+: '
     let name = trim(p[2:])
     if name != '' && name != '.' && name != '..'
+      let name = s:dir . '/' . name
       call s:prompt_popup_close()
+      let dir = fnamemodify(name, ':h')
+      if !isdirectory(dir)
+        call mkdir(dir, "p")
+      endif
       let s:action = ''
       call feedkeys("\<ESC>:" . s:last_winnr . "wincmd w\<CR>:edit " . name . "\<CR>")
       return
@@ -878,7 +883,7 @@ func s:popup_remove_file()
   if p =~ '^+: '
     let name = trim(p[2:])
     if name != ''
-      call delete(name)
+      call delete(s:dir . '/' . name)
     endif
   endif
   call s:prompt_popup_close()
