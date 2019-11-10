@@ -4,6 +4,8 @@ let s:inited = v:false
 let s:dir = getcwd()
 let s:total = 0
 let s:timer = -1
+let s:current = []
+let s:operation = ''
 
 
 func! s:find_git()
@@ -41,7 +43,7 @@ func s:find(cmd, render)
     let cmd = '+. ' . cmd
   endif
   let parts = split(cmd, '\s\+')
-  if len(parts) == 1
+  if len(parts) == 1 && parts[0] !~ '^\+'
     let args = '+.'
     let filter = cmd
   else
@@ -51,29 +53,104 @@ func s:find(cmd, render)
   if filter == ''
     return
   endif
-  let [run, args] = s:parse_args(args, filter)
+  let [run, args, Fmt] = s:parse_args(args, filter)
   if !empty(run)
-    call s:execute(run, args, a:render)
+    call s:execute(run, args, a:render, Fmt)
   endif
+endfunc
+
+
+func s:max_count()
+  return get(g:, 'finder_max_files', 100)
 endfunc
 
 
 func s:gen_find_cmd(cwd, options, filter)
   let s:dir = a:cwd
-  let max_count = get(g:, 'finder_max_files', 100)
   let cmd = [
         \ '/bin/sh', '-c',
-        \ join(['fd', '-p'] + a:options + [a:filter, '|', 'rg', '--json', '--max-count', max_count, a:filter], ' ')
+        \ join(['fd', '-p'] + a:options + [a:filter, '|', 'rg', '--json', '--max-count', s:max_count(), a:filter], ' ')
         \ ]
   let args = #{cwd: a:cwd}
-  return [cmd, args]
+  return [cmd, args, function('s:find_fmt')]
+endfunc
+
+
+func s:find_fmt(item)
+  let data = #{
+        \ text: trim(a:item.data.lines.text),
+        \ matches: a:item.data.submatches,
+        \ lnum: a:item.data.line_number,
+        \ pathprops: [],
+        \ }
+  let data.path = data.text
+  return data
+endfunc
+
+
+func s:rg_fmt(item)
+  let data = #{
+        \ matches: a:item.data.submatches,
+        \ path: a:item.data.path.text,
+        \ lnum: a:item.data.line_number,
+        \ }
+  let text = get(a:item.data.lines, 'text', '')
+  if text == ''
+    return {}
+  endif
+  let p = data.path[len(s:dir)+1:]
+  if p == ''
+    let p = '.'
+  endif
+  let line = a:item.data.line_number
+  let path = p
+  let p .= ':'. line . ': '
+  if text[-1:] == "\n"
+    let text = text[0:-2]
+  endif
+  let data.text = p . text
+  let size = strlen(p)
+  for k in data.matches
+    let k.start += size
+    let k.end += size
+  endfor
+  let pathprop = #{
+        \ col: 1,
+        \ length: strlen(path),
+        \ type: 'finder_path',
+        \ }
+  let line_length = strlen(string(line))
+  let lineprop = #{
+        \ col: pathprop.length+2,
+        \ length: line_length,
+        \ type: 'finder_line_number',
+        \ }
+  let data.pathprops = [pathprop, lineprop]
+  return data
+endfunc
+
+
+func s:gen_path(cwd, pattern)
+  if a:pattern == ''
+    return a:cwd
+  endif
+  if a:pattern =~ '^/'
+    return a:pattern
+  endif
+  return a:cwd . '/' . a:pattern
 endfunc
 
 
 func s:parse_args(args, filter)
-  if a:args[1] == ''
-    let cmd = ['', {}]
+  let project_path = s:find_git()
+  if a:args[1] == 'g'
+    let s:operation = 'rg'
+    let opts = #{cwd: s:gen_path(project_path, a:args[2:])}
+    let s:dir = opts.cwd
+    let action = ['rg', '-i', '--json', '--max-count', s:max_count(), a:filter, opts.cwd]
+    let cmd = [action, opts, function('s:rg_fmt')]
   else
+    let s:operation = 'fd'
     let options = ['--type=f']
     let sub = ''
     if a:args[1] == 'a'
@@ -85,19 +162,18 @@ func s:parse_args(args, filter)
     else
       let sub = a:args[1:]
     endif
-    if sub =~ '^/'
-      let dir = sub
-    else
-      let dir = s:find_git() . '/' . sub
-    endif
+    let dir = s:gen_path(project_path, sub)
     let cmd = s:gen_find_cmd(dir, options, a:filter)
   endif
   return cmd
 endfunc
 
 
-func s:execute(run, args, render)
-  let opts = #{close_cb: {c->s:render_result(c, a:render)}}
+func s:execute(run, args, render, fmt)
+  if has_key(a:args, 'cwd') && !isdirectory(a:args.cwd)
+    return
+  endif
+  let opts = #{close_cb: {c->s:render_result(c, a:render, a:fmt)}}
   for [k, v] in items(a:args)
     let opts[k] = v
   endfor
@@ -105,9 +181,10 @@ func s:execute(run, args, render)
 endfunc
 
 
-func s:render_result(ch, render) abort
+func s:render_result(ch, render, fmt) abort
   let data = []
-  while ch_canread(a:ch)
+  let num = 0
+  while ch_canread(a:ch) && num < s:max_count()
     try
       let f = ch_read(a:ch)
     catch /E906/
@@ -117,10 +194,12 @@ func s:render_result(ch, render) abort
     if item.type != 'match'
       continue
     endif
-    let data = add(data, #{
-          \ text: trim(item.data.lines.text),
-          \ matches: item.data.submatches,
-          \ })
+    let d = a:fmt(item)
+    if len(d) == 0
+      continue
+    endif
+    let data = add(data, d)
+    let num += 1
   endwhile
   let s:total = 0
   call a:render(data)
@@ -128,17 +207,18 @@ endfunc
 
 
 func s:init_props()
-  hi default link finderMatches Identifier
-  call prop_type_add('finder_matches', #{
-        \ highlight: 'finderMatches',
-        \ })
+  hi default finderMatches guifg=#599BD9 cterm=bold
   hi default finderCursorPosition guibg=#3A484C
-  call prop_type_add('finder_cursor', #{
-        \ highlight: 'finderCursorPosition',
-        \ })
   hi default finderPrompt guibg=#161616
   hi default finderPromptSplitter guifg=#2E393C guibg=#1C2325
   hi default finderPromptBorder guifg=#63787A guibg=#161616
+  hi default finderPath guifg=#AD2584
+  hi default finderLineNumber guifg=#217100
+
+  call prop_type_add('finder_matches', #{highlight: 'finderMatches'})
+  call prop_type_add('finder_cursor', #{highlight: 'finderCursorPosition'})
+  call prop_type_add('finder_path', #{highlight: 'finderPath'})
+  call prop_type_add('finder_line_number', #{highlight: 'finderLineNumber'})
 endfunc
 
 
@@ -199,6 +279,12 @@ func s:is_action()
   return s:action != ''
 endfunc
 
+
+func s:action_enabled()
+  return s:operation == 'fd'
+endfunc
+
+
 let s:action = ''
 func s:prompt_filter(id, key)
   if s:prompt_stop_all(a:key)
@@ -225,7 +311,7 @@ func s:prompt_filter(id, key)
     let s:action = ''
     return 1
   elseif a:key == "\<C-r>"
-    if s:action == 'rename'
+    if !s:action_enabled() || s:action == 'rename'
       return 1
     endif
     let f = s:popup_start_rename_file()
@@ -236,21 +322,23 @@ func s:prompt_filter(id, key)
     let s:prompt_popup_pos = strlen(text)
     let render = v:false
   elseif a:key == "\<C-f>"
-    if s:action == 'new'
+    if !s:action_enabled() || s:action == 'new'
       return 1
     endif
     let text = s:popup_start_new_file() . ' '
     let s:prompt_popup_pos = strlen(text)
     let render = v:false
   elseif a:key == "\<C-d>"
-    if s:action == 'remove'
+    if !s:action_enabled() || s:action == 'remove'
       return 1
     endif
     let text = s:popup_start_remove_file() . ' '
     let s:prompt_popup_pos = strlen(text)
     let render = v:false
   elseif a:key == "\<CR>"
-    if s:action == 'rename'
+    if s:operation == 'rg'
+      call s:rg_open()
+    elseif s:action == 'rename'
       call s:popup_rename_file()
     elseif s:action == 'new'
       call s:popup_new_file()
@@ -390,13 +478,23 @@ func filefinder#create_prompt()
 endfunc
 
 
-func s:info_popup_getline()
+func s:info_popup_getlnum()
   if s:info_popup == -1
-    return ""
+    return 0
   endif
   let nr = winbufnr(s:info_popup)
   let info = getbufinfo(nr)
-  let content = getbufline(nr, info[0].signs[0].lnum)
+  return info[0].signs[0].lnum
+endfunc
+
+
+func s:info_popup_getline()
+  let lnum = s:info_popup_getlnum()
+  if lnum == 0
+    return ''
+  endif
+  let nr = winbufnr(s:info_popup)
+  let content = getbufline(nr, lnum)
   return content[0]
 endfunc
 
@@ -428,6 +526,7 @@ func s:render_popup(data)
   if len(a:data) <= 0
     return
   endif
+  let s:current = a:data
   let s:info_popup = popup_create(a:data, #{
         \ line: 5,
         \ padding: [1, 1, 1, 1],
@@ -448,11 +547,18 @@ func s:render_popup(data)
   let i = 1
   for item in a:data
     for m in item.matches
-      call prop_add(i, m.start+1, #{
-            \ length: m.end - m.start,
-            \ type: 'finder_matches',
-            \ bufnr: nr,
-            \ })
+      try
+        call prop_add(i, m.start+1, #{
+              \ length: m.end - m.start,
+              \ type: 'finder_matches',
+              \ bufnr: nr,
+              \ })
+      catch /E964/
+        call Log(string(item))
+      endtry
+    endfor
+    for p in item.pathprops
+      call prop_add(i, p.col, #{length: p.length, type: p.type, bufnr: nr})
     endfor
     let i += 1
   endfor
@@ -547,4 +653,16 @@ func s:popup_remove_file()
   endif
   call s:prompt_popup_close()
   let s:action = ''
+endfunc
+
+
+func s:rg_open()
+  let lnum = s:info_popup_getlnum()
+  if lnum == 0
+    return
+  endif
+  let data = s:current[lnum-1]
+  call s:prompt_popup_close()
+  call s:info_popup_close()
+  call feedkeys("\<ESC>:" . s:last_winnr . "wincmd w\<CR>:edit " . data.path . "\<CR>:" . data.lnum . "\<CR>")
 endfunc
