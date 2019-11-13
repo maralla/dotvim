@@ -393,10 +393,10 @@ endfunc
 func s:prompt_popup_close()
   if s:prompt_popup != -1
     call popup_close(s:prompt_popup)
-    set cursorline
-    exe 'set t_ve='.s:t_ve
     let s:prompt_popup = -1
   endif
+  set cursorline
+  exe 'set t_ve='.s:t_ve
 endfunc
 
 
@@ -466,6 +466,7 @@ func filefinder#create_prompt()
         \ borderchars: ['─', '│', '─', '│', '┌', '┐', '┘', '└'],
         \ borderhighlight: ['finderPromptBorder'],
         \ filter: function('s:prompt_filter'),
+        \ callback: function('s:prompt_callback')
         \ })
   let nr = winbufnr(s:prompt_popup)
   let s:prompt_popup_pos = 1
@@ -475,6 +476,15 @@ func filefinder#create_prompt()
         \ id: s:prop_id_cursor,
         \ type: 'finder_cursor',
         \ })
+endfunc
+
+
+func s:prompt_callback(id, result)
+  if a:result == -1
+    call s:prompt_popup_close()
+    call s:info_popup_close()
+    let s:action = ''
+  endif
 endfunc
 
 
@@ -547,15 +557,11 @@ func s:render_popup(data)
   let i = 1
   for item in a:data
     for m in item.matches
-      try
-        call prop_add(i, m.start+1, #{
-              \ length: m.end - m.start,
-              \ type: 'finder_matches',
-              \ bufnr: nr,
-              \ })
-      catch /E964/
-        call Log(string(item))
-      endtry
+      call prop_add(i, m.start+1, #{
+            \ length: m.end - m.start,
+            \ type: 'finder_matches',
+            \ bufnr: nr,
+            \ })
     endfor
     for p in item.pathprops
       call prop_add(i, p.col, #{length: p.length, type: p.type, bufnr: nr})
