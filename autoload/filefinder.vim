@@ -6,6 +6,7 @@ let s:total = 0
 let s:timer = -1
 let s:current = []
 let s:operation = ''
+let s:current_cursor = 1
 
 
 func! s:find_git()
@@ -348,12 +349,6 @@ func s:prompt_filter(id, key)
       call s:popup_open_file()
     endif
     return 1
-  elseif a:key == "\<DOWN>" || a:key == "\<C-j>" || a:key == "\<C-n>"
-    call s:info_popup_do("normal! j")
-    return 1
-  elseif a:key == "\<UP>" || a:key == "\<C-k>" || a:key == "\<C-p>"
-    call s:info_popup_do("normal! k")
-    return 1
   elseif a:key == "\<LEFT>" || a:key == "\<C-h>"
     if s:prompt_stop_move(text)
       return 1
@@ -530,6 +525,16 @@ func s:info_popup_do(cmd)
 endfunc
 
 
+func s:info_filter(id, key)
+  if a:key == "\<DOWN>" || a:key == "\<C-j>" || a:key == "\<C-n>"
+    return popup_filter_menu(a:id, "j")
+  elseif a:key == "\<UP>" || a:key == "\<C-k>" || a:key == "\<C-p>"
+    return popup_filter_menu(a:id, 'k')
+  endif
+  return 0
+endfunc
+
+
 let s:info_popup = -1
 func s:render_popup(data)
   call s:info_popup_close()
@@ -548,6 +553,7 @@ func s:render_popup(data)
         \ scrollbar: 0,
         \ mapping: v:false,
         \ highlight: 'finderPrompt',
+        \ filter: function('s:info_filter'),
         \ borderhighlight: ['finderPromptBorder'],
         \ })
   call popup_setoptions(s:prompt_popup, #{
