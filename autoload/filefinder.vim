@@ -212,7 +212,7 @@ func s:init_props()
   hi default finderCursorPosition guibg=#3A484C
   hi default finderPrompt guibg=#161616
   hi default finderPromptSplitter guifg=#2E393C guibg=#1C2325
-  hi default finderPromptBorder guifg=#63787A guibg=#161616
+  hi default finderPromptBorder guifg=#404D4F guibg=#161616
   hi default finderPath guifg=#AD2584
   hi default finderLineNumber guifg=#217100
 
@@ -306,6 +306,9 @@ func s:prompt_filter(id, key)
     endif
     let text = s:prompt_popup_delete(text)
     call s:prompt_popup_backward()
+  elseif a:key == "\x80PS" || a:key == "\x80PE"
+    " Remove bracketed-paste characters. :h t_PE
+    return 1
   elseif a:key == "\<ESC>"
     call s:prompt_popup_close()
     call s:info_popup_close()
