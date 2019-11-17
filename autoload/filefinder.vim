@@ -530,9 +530,11 @@ endfunc
 
 func s:info_filter(id, key)
   if a:key == "\<DOWN>" || a:key == "\<C-j>" || a:key == "\<C-n>"
-    return popup_filter_menu(a:id, "j")
+    call s:info_popup_do("normal! j")
+    return 1
   elseif a:key == "\<UP>" || a:key == "\<C-k>" || a:key == "\<C-p>"
-    return popup_filter_menu(a:id, 'k')
+    call s:info_popup_do("normal! k")
+    return 1
   endif
   return 0
 endfunc
