@@ -675,7 +675,12 @@ func s:popup_remove_file()
   if p =~ '^+: '
     let name = trim(p[2:])
     if name != ''
-      call delete(s:dir . '/' . name)
+      let path = s:dir . '/' . name
+      let nr = bufnr(path)
+      if nr >= 0
+        exec nr . 'bwipeout'
+      endif
+      call delete(path)
     endif
   endif
   call s:prompt_popup_close()
