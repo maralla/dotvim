@@ -138,6 +138,14 @@ func s:gen_path(cwd, pattern)
   if a:pattern =~ '^/'
     return a:pattern
   endif
+  if a:pattern =~ '^c'
+    let remain = a:pattern[1:]
+    let cwd = expand('%:h')
+    if remain != ""
+      let cwd = cwd . '/' . remain
+    endif
+    return cwd
+  endif
   return a:cwd . '/' . a:pattern
 endfunc
 
@@ -160,6 +168,8 @@ func s:parse_args(args, filter)
     elseif a:args[1] == 'h'
       let options = options + ['--hidden']
       let sub = a:args[2:]
+    elseif a:args[1] == 'c'
+      let sub = expand('%:h')
     else
       let sub = a:args[1:]
     endif

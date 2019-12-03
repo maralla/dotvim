@@ -128,7 +128,7 @@ augroup myvimrc
   autocmd BufNewFile,BufRead *.h set filetype=c
   autocmd BufReadPost * try | exe 'normal! g`"' | catch /E19/ | endtry
   autocmd FileType css,less,javascript,json,html,puppet,yaml,jinja,vim,vue setlocal shiftwidth=2 tabstop=2 softtabstop=2
-  autocmd FileType go setlocal noexpandtab
+  autocmd FileType go setlocal noexpandtab nowrap
   autocmd WinEnter,BufWinEnter * if &ft != '__margin__' | set cursorline | endif
   autocmd WinLeave * if &ft != '__margin__' | set nocursorline | endif
 augroup END
@@ -559,5 +559,3 @@ hi rustCommentLineDoc guifg=#714E41
 " abbreviate
 ab todo TODO
 " ********************************
-"
-set cot=menuone,longest,preview
