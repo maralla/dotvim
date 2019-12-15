@@ -48,5 +48,5 @@ let g:completor_filetype_map.c = {'ft': 'lsp', 'cmd': '/home/maralla/Workspace/s
 
 augroup completor_config
   autocmd!
-  autocmd BufWritePost *.go :call completor#do('format')
+  autocmd BufWritePost *.go,*.rs :call completor#do('format')
 augroup end
