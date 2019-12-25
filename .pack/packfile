@@ -45,11 +45,6 @@
   name: Valloric/MatchTagAlways
   opt: false
 - 
-  category: themes
-  local: false
-  name: "altercation/vim-colors-solarized"
-  opt: true
-- 
   category: lang
   local: false
   name: "cakebaker/scss-syntax.vim"
@@ -255,11 +250,6 @@
   category: default
   local: false
   name: "mattn/webapi-vim"
-  opt: false
-- 
-  category: default
-  local: false
-  name: "mhinz/vim-signify"
   opt: false
 - 
   category: default

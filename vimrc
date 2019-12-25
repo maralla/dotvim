@@ -38,7 +38,7 @@ syntax enable
 set termguicolors
 let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
 let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
-colorscheme solarized8
+"colorscheme solarized8
 
 set timeoutlen=300                              " mapping timeout
 set ttimeoutlen=50                              " keycode timeout
@@ -240,6 +240,11 @@ vnoremap * <ESC>:call setreg("/", <SID>get_selected())<CR>nN
 nnoremap <space>f :call filefinder#create_prompt()<CR>
 "}}}
 
+augroup hunkstart
+  autocmd!
+  autocmd VimEnter * call hunk#start()
+augroup END
+
 "netrw
 let g:netrw_liststyle = 3
 let g:netrw_banner = 0
@@ -429,6 +434,8 @@ endfunc
 let s:color = {
       \ 'status_bg': '#212121',
       \ 'status_fg': '#757575',
+      \ 'status_nc_bg': '#212121',
+      \ 'status_nc_fg': '#6b6b6b',
       \ 'fname_modified': '#c38300',
       \ 'fname_readonly': '#525252',
       \ }
@@ -462,7 +469,7 @@ let s:status_ignored_types = ['unite', 'finder', '__margin__']
 
 func! s:set_highlight()
   call s:hi('StatusLine', s:color.status_bg, s:color.status_bg)
-  call s:hi('StatusLineNC', s:color.status_bg, s:color.status_bg)
+  call s:hi('StatusLineNC', s:color.status_nc_bg, s:color.status_nc_bg)
 
   if index(s:status_ignored_types, &ft) >= 0
     return
@@ -536,7 +543,7 @@ hi Special      guifg=#B37460
 hi SpecialKey   guifg=#212a2d guibg=#191919
 hi Normal       guibg=#161616 guifg=#81848A
 hi Comment      guifg=#41495A gui=italic ctermfg=NONE ctermbg=NONE cterm=italic
-hi CursorLine   guibg=#191919
+hi CursorLine   guibg=#191919 cterm=NONE
 hi ColorColumn  guibg=#191919
 hi MatchParen   gui=bold      guifg=#fdf6e3 guibg=NONE
 hi LineNr       guibg=#212121
@@ -550,6 +557,7 @@ hi Pmenu        cterm=NONE gui=NONE guibg=#252525 guifg=#696C70
 hi PmenuSel     cterm=NONE gui=NONE guibg=#343638 guifg=NONE
 hi PmenuSbar    cterm=NONE gui=NONE guibg=#343638 guifg=NONE
 hi PmenuThumb   cterm=NONE gui=NONE guibg=#515457 guifg=NONE
+hi NonText      guifg=#464646 guibg=NONE
 
 hi rustCommentLineDoc guifg=#714E41
 " ********************************
