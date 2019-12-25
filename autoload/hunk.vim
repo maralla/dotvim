@@ -1,45 +1,17 @@
 scriptencoding utf8
 
-let s:inited = v:false
 
-func s:init()
+func hunk#start()
   sign define HunkAdd text=+ texthl=HunkAddSign
   sign define HunkChange text=! texthl=HunkChangeSign
-  hi default HunkAddSign guifg=#3c6540 guibg=#212121
-  hi default HunkChangeSign guifg=#7c8500 guibg=#212121
-  hi default HunkDeleteSign guifg=#b61827 guibg=#212121
+  hi default HunkAddSign guifg=#798508 guibg=#212121
+  hi default HunkChangeSign guifg=#896E1D guibg=#212121
+  hi default HunkDeleteSign guifg=#892C35 guibg=#212121
 
   augroup hunk
-    autocmd BufReadPost  * call s:push_task()
-    autocmd BufWritePost * call s:push_task()
+    autocmd BufReadPost  * call s:run()
+    autocmd BufWritePost * call s:run()
   augroup END
-endfunc
-
-
-let s:run_next = v:false
-
-
-func! s:push_task()
-  if &modified
-    return
-  endif
-  let s:run_next = v:true
-endfunc
-
-
-func! s:run_task()
-  if !s:run_next
-    return
-  endif
-  let s:run_next = v:false
-  call s:run()
-endfunc
-
-
-func! hunk#start()
-  call Log("saaa")
-  call s:init()
-  let timer = timer_start(1000, {t -> s:run_task()}, #{repeat: -1})
 endfunc
 
 
