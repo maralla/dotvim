@@ -12,6 +12,7 @@ func hunk#start()
     autocmd BufReadPost  * call s:run()
     autocmd BufWritePost * call s:run()
   augroup END
+  call s:run()
 endfunc
 
 
@@ -76,7 +77,10 @@ func s:render(hunks)
       let msg = string(minus_count < 100 ? minus_count : '>')
       if plus_line != 0
         let name = 'HunkDelete' . msg
-        exe 'sign define ' . name . ' text=' . msg . ' texthl=HunkDeleteSign'
+        call sign_define(name, #{
+              \ text: msg,
+              \ texthl: 'HunkDeleteSign',
+              \ })
         call add(signs, #{
               \ id: s:get_sign_id(),
               \ line: plus_line,
@@ -108,13 +112,13 @@ let s:signs = {}
 
 func s:place_sign(signs)
   for sign in a:signs
-    exe 'sign place '. sign.id . ' line=' . sign.line . ' name=' . sign.name . ' group=githunk priority=1 buffer=' . sign.buffer
+    call sign_place(sign.id, 'githunk', sign.name, sign.buffer, #{lnum: sign.line, priority: 1})
   endfor
   let nr = bufnr()
   let signs = get(s:signs, nr, [])
   if !empty(signs)
     for old in signs
-      exe 'sign unplace ' . old.id . ' group=githunk buffer=' . old.buffer
+      call sign_unplace('githunk', #{id: old.id, buffer: old.buffer})
     endfor
   endif
   let s:signs[nr] = a:signs

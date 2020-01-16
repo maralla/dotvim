@@ -19,16 +19,6 @@
   name: "Shougo/neco-vim"
   opt: false
 - 
-  category: default
-  local: false
-  name: "Shougo/neosnippet-snippets"
-  opt: false
-- 
-  category: default
-  local: false
-  name: Shougo/neosnippet.vim
-  opt: false
-- 
   build: make
   category: default
   local: false
@@ -182,11 +172,6 @@
   category: default
   local: false
   name: majutsushi/tagbar
-  opt: false
-- 
-  category: default
-  local: false
-  name: "maralla/completor-neosnippet"
   opt: false
 - 
   category: default

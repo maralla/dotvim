@@ -124,6 +124,7 @@ endfunc
 
 " Autocmds.
 augroup myvimrc
+  autocmd!
   autocmd BufNewFile,BufRead *.snippets call s:delay_set({->s:set_snippets_type()})
   autocmd BufNewFile,BufRead *.h set filetype=c
   autocmd BufReadPost * try | exe 'normal! g`"' | catch /E19/ | endtry
@@ -203,12 +204,6 @@ vnoremap > >gv
 
 " reselect last paste
 nnoremap <expr> gp '`[' . strpart(getregtype(), 0, 1) . '`]'
-
-" find current word in quickfix
-nnoremap <leader>fw :execute "vimgrep ".expand("<cword>")." %"<cr>:copen<cr>
-
-" find last search in quickfix
-nnoremap <leader>ff :execute 'vimgrep /'.@/.'/g %'<cr>:copen<cr>
 
 " make Y consistent with C and D. See :help Y.
 nnoremap Y y$
@@ -552,12 +547,13 @@ hi DiffAdd      guibg=#212121
 hi DiffChange   guibg=#212121
 hi DiffDelete   guibg=#212121
 hi Type         guifg=#A38D61
-hi VertSplit    guibg=#212121 guifg=#212121
+hi VertSplit    guibg=#414141 guifg=#212121
 hi Pmenu        cterm=NONE gui=NONE guibg=#252525 guifg=#696C70
 hi PmenuSel     cterm=NONE gui=NONE guibg=#343638 guifg=NONE
 hi PmenuSbar    cterm=NONE gui=NONE guibg=#343638 guifg=NONE
 hi PmenuThumb   cterm=NONE gui=NONE guibg=#515457 guifg=NONE
 hi NonText      guifg=#464646 guibg=NONE
+hi ToDo         guifg=#892020 guibg=NONE gui=bold cterm=bold
 
 hi rustCommentLineDoc guifg=#714E41
 " ********************************
