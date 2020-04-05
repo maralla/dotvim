@@ -15,10 +15,7 @@ def get_binding_name(token):
 endglobal
 
 snippet func "function" b
-`!p
-snip.rv = ""
-if is_upper(t[1]):
-	snip.rv = "// {} ...\n".format(t[1])
+`!p add_doc(t[1])
 `func ${1:myFunc}(${2:args}) {
 }
 endsnippet
@@ -40,7 +37,7 @@ endsnippet
 snippet pack "package" b
 package ${1:`!v expand('%:p:h:t')`}
 
-$2
+$0
 endsnippet
 
 snippet main "func main()" b
@@ -71,4 +68,8 @@ endsnippet
 
 snippet ctx "context.Context"
 context.Context
+endsnippet
+
+snippet pln "fmt.Println" b
+fmt.Println($0)
 endsnippet

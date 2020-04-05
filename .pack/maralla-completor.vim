@@ -44,7 +44,10 @@ let g:completor_filetype_map.go = {'ft': 'lsp', 'cmd': 'gopls'}
 let g:completor_filetype_map.rust = {'ft': 'lsp', 'cmd': 'rls'}
 " Enable lsp for c by using clangd
 " let g:completor_filetype_map.c = {'ft': 'lsp', 'cmd': 'clangd-7'}
-let g:completor_filetype_map.c = {'ft': 'lsp', 'cmd': '/home/maralla/Workspace/src/ccls/Release/ccls'}
+let g:completor_filetype_map.c = {'ft': 'lsp', 'cmd': '/usr/local/bin/ccls'}
+
+
+let g:completor_snippets_dirs = [$HOME."/.vim/pack/default/start/vim-snippets/UltiSnips", $HOME."/.vim/mysnippets"]
 
 augroup completor_config
   autocmd!
