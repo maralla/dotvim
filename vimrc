@@ -463,8 +463,8 @@ let s:status_ignored_types = ['unite', 'finder', '__margin__']
 
 
 func! s:set_highlight()
-  call s:hi('StatusLine', s:color.status_bg, s:color.status_bg)
-  call s:hi('StatusLineNC', s:color.status_nc_bg, s:color.status_nc_bg)
+  call s:hi('StatusLine', s:color.status_bg, s:color.status_bg, 'term=NONE gui=NONE cterm=NONE')
+  call s:hi('StatusLineNC', s:color.status_nc_bg, s:color.status_nc_bg, 'term=NONE gui=NONE cterm=NONE')
 
   if index(s:status_ignored_types, &ft) >= 0
     return
