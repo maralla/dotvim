@@ -427,8 +427,8 @@ endfunc
 
 
 let s:color = {
-      \ 'status_bg': '#212121',
-      \ 'status_fg': '#757575',
+      \ 'status_bg': '#131313',
+      \ 'status_fg': '#6D6D6D',
       \ 'status_nc_bg': '#212121',
       \ 'status_nc_fg': '#6b6b6b',
       \ 'fname_modified': '#c38300',
@@ -481,8 +481,6 @@ func! s:set_highlight()
   call s:hi_filename()
   call s:hi('StatusActiveValidator', s:color.status_bg, '#C62828')
 
-  call s:hi('VertSplit', s:color.status_bg, s:color.status_fg)
-  call s:hi('SignColumn', s:color.status_bg)
   call s:hi('ValidatorErrorSign', s:color.status_bg, '#C62828', 'cterm=bold')
   call s:hi('ValidatorWarningSign', s:color.status_bg, '#F9A825', 'cterm=bold')
 endfunc
@@ -524,8 +522,17 @@ augroup mystatusline "{{{
 augroup END "}}}
 
 
-" ********************************
-" colorscheme
+" colorscheme {{{
+
+" hi Normal       guibg=#161616 guifg=#81848A
+" hi Normal       guibg=NONE guifg=#81848A
+hi Normal       guibg=NONE guifg=NONE
+hi ColorColumn  guibg=#0B0B0B
+hi CursorLine   guibg=#0B0B0B cterm=NONE
+hi VertSplit    guibg=#0B0B0B guifg=#414141 term=NONE cterm=NONE gui=NONE
+hi Signcolumn   guibg=#0B0B0B guifg=NONE
+hi SpecialKey   guibg=#0B0B0B guifg=#212a2d
+
 hi Constant     guifg=#82976F
 hi Folded       guifg=#616161 guibg=NONE
 hi Statement    guifg=#5E81AC
@@ -535,11 +542,8 @@ hi Visual       guibg=#292E38 term=NONE cterm=NONE gui=NONE guifg=NONE
 hi Identifier   guifg=#81A1C1
 hi PreProc      guifg=#9E7D98
 hi Special      guifg=#B37460
-hi SpecialKey   guifg=#212a2d guibg=#191919
-hi Normal       guibg=#161616 guifg=#81848A
-hi Comment      guifg=#41495A gui=italic ctermfg=NONE ctermbg=NONE cterm=italic
-hi CursorLine   guibg=#191919 cterm=NONE
-hi ColorColumn  guibg=#191919
+" hi Comment      guifg=#41495A gui=italic ctermfg=NONE ctermbg=NONE cterm=italic
+hi Comment      guifg=#62697B gui=italic ctermfg=NONE ctermbg=NONE cterm=italic
 hi MatchParen   gui=bold      guifg=#fdf6e3 guibg=NONE
 hi LineNr       guibg=#212121
 hi CursorLineNr guibg=#212121 guifg=#839496
@@ -547,7 +551,6 @@ hi DiffAdd      guibg=#212121
 hi DiffChange   guibg=#212121
 hi DiffDelete   guibg=#212121
 hi Type         guifg=#A38D61
-hi VertSplit    guibg=#414141 guifg=#212121
 hi Pmenu        cterm=NONE gui=NONE guibg=#252525 guifg=#696C70
 hi PmenuSel     cterm=NONE gui=NONE guibg=#343638 guifg=NONE
 hi PmenuSbar    cterm=NONE gui=NONE guibg=#343638 guifg=NONE
@@ -556,10 +559,17 @@ hi NonText      guifg=#464646 guibg=NONE
 hi ToDo         guifg=#892020 guibg=NONE gui=bold cterm=bold
 
 hi rustCommentLineDoc guifg=#714E41
-" ********************************
+" ********************************}}}
 
 
 " ********************************
 " abbreviate
 ab todo TODO
 " ********************************
+
+
+" Copy/paste fix
+if has('linux')
+  xmap <silent> <SPACE> y:call system('wl-copy -n', @")<CR>
+  nmap <silent> <SPACE>p :let @"=system("wl-paste -n")<cr>p
+endif

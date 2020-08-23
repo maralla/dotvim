@@ -67,6 +67,11 @@
 - 
   category: default
   local: false
+  name: "dart-lang/dart-vim-plugin"
+  opt: false
+- 
+  category: default
+  local: false
   name: "dhruvasagar/vim-table-mode"
   on: TableModeToggle
   opt: true
@@ -197,6 +202,11 @@
   category: default
   local: false
   name: maralla/mycolor
+  opt: false
+- 
+  category: default
+  local: false
+  name: maralla/snips.vim
   opt: false
 - 
   category: default

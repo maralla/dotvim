@@ -24,11 +24,13 @@ let g:completor_auto_trigger = 1
 " inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 
 noremap <silent> <leader>d :call completor#do('definition')<CR>
+noremap <silent> <leader>,d :call completor#do('implementation')<CR>
 noremap <silent> <leader>c :call completor#do('doc')<CR>
 noremap <silent> <leader>f :call completor#do('format')<CR>
 noremap <silent> <leader>s :call completor#do('hover')<CR>
 " let g:completor_javascript_omni_trigger = "\\w+$|[\\w\\)\\]\\}\'\"]+\\.\\w*$"
 let g:completor_set_options = 1
+let g:completor_use_popup_window = 1
 let g:completor_auto_close_doc = 1
 let g:completor_completion_delay = 200
 let g:completor_go_guru_binary = 'guru'
@@ -37,17 +39,39 @@ map <c-\> <Plug>CompletorCppJumpToPlaceholder
 imap <c-\> <Plug>CompletorCppJumpToPlaceholder
 
 let g:completor_filetype_map = {}
-let g:completor_filetype_map.javascript = {'ft': 'lsp', 'cmd': '/home/maralla/Workspace/tmp/node/node_modules/.bin/flow lsp'}
+" let g:completor_filetype_map.javascript = {'ft': 'lsp', 'cmd': '/home/maralla/Workspace/tmp/node/node_modules/.bin/flow lsp'}
 " Enable lsp for go by using gopls
 let g:completor_filetype_map.go = {'ft': 'lsp', 'cmd': 'gopls'}
 " Enable lsp for rust by using rls
-let g:completor_filetype_map.rust = {'ft': 'lsp', 'cmd': 'rls'}
+" let g:completor_filetype_map.rust = {'ft': 'lsp', 'cmd': 'rls'}
+let g:completor_filetype_map.rust = {'ft': 'lsp', 'cmd': 'rust-analyzer'}
 " Enable lsp for c by using clangd
 " let g:completor_filetype_map.c = {'ft': 'lsp', 'cmd': 'clangd-7'}
 let g:completor_filetype_map.c = {'ft': 'lsp', 'cmd': '/usr/local/bin/ccls'}
 
+let g:completor_filetype_map.json = {
+      \ 'ft': 'lsp',
+      \ 'cmd': '/home/maralla/Workspace/tmp/js/node_modules/.bin/vscode-json-languageserver --stdio',
+      \ 'insertText': 'label',
+      \ 'config': {
+      \   'json': {
+      \      'format': { 'enable': v:false },
+      \      'schemas': [
+      \        {'fileMatch': ['package.json'], 'url': 'http://json.schemastore.org/package'},
+      \      ]
+      \    }
+      \  }
+      \ }
+
+let g:completor_filetype_map.dart = {
+      \ 'ft': 'lsp',
+      \ 'cmd': 'dart /home/maralla/Workspace/src/flutter/bin/cache/dart-sdk/bin/snapshots/analysis_server.dart.snapshot --lsp',
+      \ }
+
 
 let g:completor_snippets_dirs = [$HOME."/.vim/pack/default/start/vim-snippets/UltiSnips", $HOME."/.vim/mysnippets"]
+
+let g:completor_black_binary = $HOME.'/Workspace/app/bin/isort_black'
 
 augroup completor_config
   autocmd!

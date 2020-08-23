@@ -57,6 +57,8 @@ func s:find(cmd, render)
   let [run, args, Fmt] = s:parse_args(args, filter)
   if !empty(run)
     call s:execute(run, args, a:render, Fmt)
+  elseif has_key(args, 'data')
+    call a:render(args)
   endif
 endfunc
 
@@ -70,7 +72,7 @@ func s:gen_find_cmd(cwd, options, filter)
   let s:dir = a:cwd
   let cmd = [
         \ '/bin/sh', '-c',
-        \ join(['fd', '-p'] + a:options + [a:filter, '|', 'rg', '--json', '--max-count', s:max_count(), a:filter], ' ')
+        \ join(['fd', '-p'] + a:options + ['|', 'rg', '--json', '--max-count', s:max_count(), a:filter], ' ')
         \ ]
   let args = #{cwd: a:cwd}
   return [cmd, args, function('s:find_fmt')]
@@ -158,6 +160,9 @@ func s:parse_args(args, filter)
     let s:dir = opts.cwd
     let action = ['rg', '-i', '--json', '--max-count', s:max_count(), a:filter, opts.cwd]
     let cmd = [action, opts, function('s:rg_fmt')]
+  elseif a:args[1] == 'e'
+    let opts = #{data: s:eval(a:filter), disable_cursorline: v:true}
+    let cmd = [[], opts, 0]
   else
     let s:operation = 'fd'
     let options = ['--type=f']
@@ -177,6 +182,31 @@ func s:parse_args(args, filter)
     let cmd = s:gen_find_cmd(dir, options, a:filter)
   endif
   return cmd
+endfunc
+
+
+func s:eval(stmt)
+  :pyx << EOF
+import vim
+try:
+  data = str(eval(vim.eval('a:stmt')))
+except:
+  data = ''
+EOF
+
+  try
+    let data = pyxeval('data')
+  catch /E859/
+    let data = ''
+  endtry
+
+  let res = []
+
+  for item in split(data, "\n")
+    call add(res, #{matches: [], pathprops: [], text: item})
+  endfor
+
+  return res
 endfunc
 
 
@@ -220,9 +250,9 @@ endfunc
 func s:init_props()
   hi default finderMatches guifg=#599BD9 cterm=bold
   hi default finderCursorPosition guibg=#3A484C
-  hi default finderPrompt guibg=#161616
+  hi default finderPrompt guibg=NONE
   hi default finderPromptSplitter guifg=#2E393C guibg=#1C2325
-  hi default finderPromptBorder guifg=#404D4F guibg=#161616
+  hi default finderPromptBorder guifg=#404D4F guibg=NONE
   hi default finderPath guifg=#AD2584
   hi default finderLineNumber guifg=#217100
 
@@ -240,10 +270,10 @@ func s:prompt_popup_forward(max)
   endif
 endfunc
 
-func s:prompt_popup_backward()
-    if s:prompt_popup_pos > 1
-      let s:prompt_popup_pos -= 1
-    endif
+func s:prompt_popup_backward(n)
+  if s:prompt_popup_pos > a:n
+    let s:prompt_popup_pos -= a:n
+  endif
 endfunc
 
 func s:prompt_popup_insert(text, key)
@@ -267,6 +297,28 @@ func s:prompt_popup_delete(text)
     let prefix = a:text[:p-1]
   endif
   return prefix . a:text[p+1:]
+endfunc
+
+
+func s:prompt_popup_delete_word(text)
+  let p = s:prompt_popup_pos - 2
+  if p < 0
+    return [a:text, 0]
+  endif
+
+  let text = a:text[:p]
+
+  let parts = split(text)
+  if len(parts) <= 1
+    let prefix = ''
+    let backs = s:prompt_popup_pos - 1
+  else
+    let backs = strlen(parts[-1])
+
+    let prefix = text[:-backs-1]
+  endif
+
+  return [prefix . a:text[p+1:], backs]
 endfunc
 
 func s:prompt_stop_move(input)
@@ -315,7 +367,13 @@ func s:prompt_filter(id, key)
       return 1
     endif
     let text = s:prompt_popup_delete(text)
-    call s:prompt_popup_backward()
+    call s:prompt_popup_backward(1)
+  elseif a:key == "\<C-w>"
+    if s:prompt_stop_move(text)
+      return 1
+    endif
+    let [text, backs] = s:prompt_popup_delete_word(text)
+    call s:prompt_popup_backward(backs)
   elseif a:key == "\x80PS" || a:key == "\x80PE"
     " Remove bracketed-paste characters. :h t_PE
     return 1
@@ -367,7 +425,7 @@ func s:prompt_filter(id, key)
       return 1
     endif
     call s:prompt_popup_do(a:id, "normal! h")
-    call s:prompt_popup_backward()
+    call s:prompt_popup_backward(1)
     let move = v:true
     let render = v:false
   elseif a:key == "\<RIGHT>" || a:key == "\<C-l>"
@@ -553,11 +611,21 @@ endfunc
 let s:info_popup = -1
 func s:render_popup(data)
   call s:info_popup_close()
-  if len(a:data) <= 0
+
+  let data = a:data
+  let args = {}
+
+  if type(a:data) == v:t_dict
+    let data = a:data.data
+    let args = a:data
+  endif
+
+  if len(data) <= 0
     return
   endif
-  let s:current = a:data
-  let s:info_popup = popup_create(a:data, #{
+  let s:current = data
+
+  let options = #{
         \ line: 5,
         \ padding: [1, 1, 1, 1],
         \ minwidth: &columns*3/5,
@@ -570,13 +638,19 @@ func s:render_popup(data)
         \ highlight: 'finderPrompt',
         \ filter: function('s:info_filter'),
         \ borderhighlight: ['finderPromptBorder'],
-        \ })
+        \ }
+
+  if get(args, 'disable_cursorline', 0)
+    let options.cursorline = 0
+  endif
+
+  let s:info_popup = popup_create(data, options)
   call popup_setoptions(s:prompt_popup, #{
         \ borderchars: ['─', '│', '─', '│', '┌', '┐', '┤', '├'],
         \ })
   let nr = winbufnr(s:info_popup)
   let i = 1
-  for item in a:data
+  for item in data
     for m in item.matches
       call prop_add(i, m.start+1, #{
             \ length: m.end - m.start,

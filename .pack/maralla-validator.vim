@@ -14,3 +14,7 @@ let g:validator_use_popup_window = 1
 
 hi ValidatorPopupColor guifg=#C51E1E
 hi ValidatorBorderColor guifg=#161616
+
+let g:validator_debug=0
+
+map <leader>e :call validator#next()<CR>

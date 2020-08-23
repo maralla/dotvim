@@ -4,9 +4,9 @@ scriptencoding utf8
 func hunk#start()
   sign define HunkAdd text=+ texthl=HunkAddSign
   sign define HunkChange text=! texthl=HunkChangeSign
-  hi default HunkAddSign guifg=#798508 guibg=#212121
-  hi default HunkChangeSign guifg=#896E1D guibg=#212121
-  hi default HunkDeleteSign guifg=#892C35 guibg=#212121
+  hi default HunkAddSign guifg=#798508 guibg=#131313
+  hi default HunkChangeSign guifg=#896E1D guibg=#131313
+  hi default HunkDeleteSign guifg=#892C35 guibg=#131313
 
   augroup hunk
     autocmd BufReadPost  * call s:run()
