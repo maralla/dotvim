@@ -256,6 +256,11 @@ func s:init_props()
   hi default finderPath guifg=#AD2584
   hi default finderLineNumber guifg=#217100
 
+  augroup filefinder
+    autocmd!
+    autocmd VimResized * call s:resize()
+  augroup END
+
   call prop_type_add('finder_matches', #{highlight: 'finderMatches'})
   call prop_type_add('finder_cursor', #{highlight: 'finderCursorPosition'})
   call prop_type_add('finder_path', #{highlight: 'finderPath'})
@@ -522,8 +527,6 @@ func filefinder#create_prompt()
   let s:prompt_popup = popup_create(' ', #{
         \ line: 2,
         \ padding: [0, 1, 0, 1],
-        \ minwidth: &columns*3/5,
-        \ maxwidth: &columns*3/5,
         \ minheight: 1,
         \ maxheight: 1,
         \ mapping: v:false,
@@ -534,6 +537,9 @@ func filefinder#create_prompt()
         \ filter: function('s:prompt_filter'),
         \ callback: function('s:prompt_callback')
         \ })
+
+  call s:set_popup_width(s:prompt_popup)
+
   let nr = winbufnr(s:prompt_popup)
   let s:prompt_popup_pos = 1
   call prop_add(1, s:prompt_popup_pos, #{
@@ -550,6 +556,32 @@ func s:prompt_callback(id, result)
     call s:prompt_popup_close()
     call s:info_popup_close()
     let s:action = ''
+  endif
+endfunc
+
+
+func s:set_popup_width(popup)
+  if &columns >= 160
+    let width = 120
+  else
+    let width = &columns*5/6
+  endif
+
+  call popup_setoptions(a:popup, #{
+        \ minwidth: width,
+        \ maxwidth: width,
+        \ })
+endfunc
+
+
+func s:resize()
+  if s:prompt_popup != -1
+    call s:set_popup_width(s:prompt_popup)
+  endif
+
+  if s:info_popup != -1
+    call s:set_popup_width(s:info_popup)
+    call popup_setoptions(s:info_popup, #{maxheight: &lines-7})
   endif
 endfunc
 
@@ -627,9 +659,8 @@ func s:render_popup(data)
 
   let options = #{
         \ line: 5,
+        \ maxheight: &lines - 7,
         \ padding: [1, 1, 1, 1],
-        \ minwidth: &columns*3/5,
-        \ maxwidth: &columns*3/5,
         \ border: [0, 1, 1, 1],
         \ borderchars: ['─', '│', '─', '│', '╭', '┐', '┘', '└'],
         \ cursorline: 1,
@@ -645,9 +676,12 @@ func s:render_popup(data)
   endif
 
   let s:info_popup = popup_create(data, options)
+
+  call s:set_popup_width(s:info_popup)
   call popup_setoptions(s:prompt_popup, #{
         \ borderchars: ['─', '│', '─', '│', '┌', '┐', '┤', '├'],
         \ })
+
   let nr = winbufnr(s:info_popup)
   let i = 1
   for item in data

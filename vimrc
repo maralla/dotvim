@@ -552,7 +552,7 @@ hi DiffChange   guibg=#212121
 hi DiffDelete   guibg=#212121
 hi Type         guifg=#A38D61
 hi Pmenu        cterm=NONE gui=NONE guibg=#252525 guifg=#696C70
-hi PmenuSel     cterm=NONE gui=NONE guibg=#343638 guifg=NONE
+hi PmenuSel     cterm=NONE gui=NONE guibg=#232323 guifg=NONE
 hi PmenuSbar    cterm=NONE gui=NONE guibg=#343638 guifg=NONE
 hi PmenuThumb   cterm=NONE gui=NONE guibg=#515457 guifg=NONE
 hi NonText      guifg=#464646 guibg=NONE
