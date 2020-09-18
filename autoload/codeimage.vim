@@ -16,7 +16,7 @@ def s:gen_cmd(t: string, ft: string): list<any>
 enddef
 
 
-def codeimage#do()
+def codeimage#do(...lines: list<string>)
   let f = expand('%:p')
   let t = expand('%:p:t')
 
@@ -26,6 +26,10 @@ def codeimage#do()
 
   if text == ''
     cmd += [f]
+  endif
+
+  if !empty(lines)
+    cmd += ['--highlight-lines', join(lines, ';')]
   endif
 
   let job = job_start(cmd)
