@@ -22,7 +22,7 @@ endsnippet
 
 snippet type "type" b
 `!p add_doc(t[1])
-`type ${1:Type} ${2:struct} {
+`type ${1:name} ${2:struct} {
 	$0
 }
 endsnippet
@@ -48,7 +48,9 @@ for line in vim.current.buffer:
         has_package = True
         break
 if not has_package:
-    snip.rv = pack + '\n\n'
+    snip._pack = pack + '\n\n'
+
+snip.rv = getattr(snip, '_pack', '')
 `func main() {
 	$0
 }
