@@ -69,8 +69,6 @@ let g:completor_filetype_map.dart = {
       \ }
 
 
-let g:completor_snippets_dirs = [$HOME."/.vim/pack/default/start/vim-snippets/UltiSnips", $HOME."/.vim/mysnippets"]
-
 let g:completor_black_binary = $HOME.'/Workspace/app/bin/isort_black'
 
 augroup completor_config

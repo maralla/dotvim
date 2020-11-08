@@ -15,8 +15,7 @@ def get_binding_name(token):
 endglobal
 
 snippet func "function" b
-`!p add_doc(t[1])
-`func ${1:myFunc}(${2:args}) {
+${1/([A-Z])?\w*/(?1:\/\/ $0 ...)/}func ${1:myFunc}(${2:args}) {
 }
 endsnippet
 

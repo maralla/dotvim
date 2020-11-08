@@ -206,7 +206,7 @@
 - 
   category: default
   local: false
-  name: maralla/snips.vim
+  name: maralla/snips
   opt: false
 - 
   category: default
