@@ -7,7 +7,7 @@ def is_upper(arg):
 def add_doc(token):
 	snip.rv = ''
 	if is_upper(token):
-		snip.rv = '// {} TODO add doc\n'.format(token)
+		snip.rv = '// {} TODO add doc.\n'.format(token)
 
 def get_binding_name(token):
 	t = token.strip('* ')
@@ -73,4 +73,14 @@ endsnippet
 
 snippet pln "fmt.Println" b
 fmt.Println($0)
+endsnippet
+
+snippet jsonun "UnmarshalJSON" b
+func (v *$1) UnmarshalJSON(data []byte) error {
+	$0
+}
+endsnippet
+
+snippet sleep "time.Sleep" b
+time.Sleep($0)
 endsnippet

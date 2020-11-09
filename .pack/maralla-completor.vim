@@ -24,7 +24,9 @@ let g:completor_auto_trigger = 1
 " inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 
 noremap <silent> <leader>d :call completor#do('definition')<CR>
+noremap <silent> <leader>r :call completor#do('references')<CR>
 noremap <silent> <leader>,d :call completor#do('implementation')<CR>
+noremap <silent> <leader>,r :call completor#do('symbol')<CR>
 noremap <silent> <leader>c :call completor#do('doc')<CR>
 noremap <silent> <leader>f :call completor#do('format')<CR>
 noremap <silent> <leader>s :call completor#do('hover')<CR>

@@ -11,6 +11,7 @@ def s:gen_cmd(t: string, ft: string): list<any>
     '--no-line-number',
     '--no-window-controls',
     '--theme', 'Nord',
+    # '-f', 'Ubuntu Mono; Noto Sans Mono CJK SC',
     '--language', ft,
   ]
 enddef
