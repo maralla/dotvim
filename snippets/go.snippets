@@ -28,7 +28,7 @@ endsnippet
 
 snippet meth "bind function to struct" b
 `!p add_doc(t[1])
-`func (`!p snip.rv=get_binding_name(t[2])` ${2:Type}) ${1:method}(${4:args}) ${5:error} {
+`func (`!p snip.rv=get_binding_name(t[2])` ${6:*}${2:Type}) ${1:method}(${4:args})${5/.+/ /}${5:error} {
 	$0
 }
 endsnippet
@@ -61,6 +61,10 @@ go func() {
 }()
 endsnippet
 
+snippet const "one line const" b
+const ${1:name} = ${2:value}
+endsnippet
+
 snippet co "consts" b
 const (
 	${1:name} = ${0:value}
@@ -87,4 +91,26 @@ endsnippet
 
 snippet ctxtm "context.WithTimeout" b
 ctx ${1/(^ctx$)?/(?1::\:)/}= context.WithTimeout(${1:context.Background()}, ${2:time.Second})
+endsnippet
+
+snippet test "test func" b
+func Test${1:Name}(t *testing.T) {
+	$0
+}
+endsnippet
+
+snippet err "define an error" b
+err${1:Name} = errors.New("${2:bad}")
+endsnippet
+
+snippet forrange "for range loop" b
+for ${1:i}, ${2:v} := range ${3:items} {
+	$0
+}
+endsnippet
+
+snippet trun "test t.Run()" b
+t.Run("${1:name}", func(t *testing.T) {
+	$0
+})
 endsnippet
