@@ -110,8 +110,6 @@ set smartcase  " do case-sensitive if there's a capital letter
 set colorcolumn=80
 set signcolumn=yes
 
-packadd matchit
-
 func! s:set_snippets_type()
   if &ft ==? 'neosnippet'
     setlocal ft=snippets

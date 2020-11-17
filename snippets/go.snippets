@@ -84,3 +84,7 @@ endsnippet
 snippet sleep "time.Sleep" b
 time.Sleep($0)
 endsnippet
+
+snippet ctxtm "context.WithTimeout" b
+ctx ${1/(^ctx$)?/(?1::\:)/}= context.WithTimeout(${1:context.Background()}, ${2:time.Second})
+endsnippet

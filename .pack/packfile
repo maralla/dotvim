@@ -27,11 +27,6 @@
 - 
   category: default
   local: false
-  name: SirVer/ultisnips
-  opt: false
-- 
-  category: default
-  local: false
   name: Valloric/MatchTagAlways
   opt: false
 - 

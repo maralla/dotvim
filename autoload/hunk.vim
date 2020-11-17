@@ -74,7 +74,7 @@ func s:render(hunks)
     endif
 
     if minus_count > 0 && plus_count == 0
-      let msg = string(minus_count < 100 ? minus_count : '>')
+      let msg = minus_count < 100 ? string(minus_count) : '>'
       if plus_line != 0
         let name = 'HunkDelete' . msg
         call sign_define(name, #{
