@@ -16,6 +16,7 @@ endglobal
 
 snippet func "function" b
 ${1/([A-Z])?\w*/(?1:\/\/ $0 ...)/}func ${1:myFunc}(${2:args}) {
+    ${VISUAL}
 }
 endsnippet
 
@@ -85,6 +86,12 @@ func (v *$1) UnmarshalJSON(data []byte) error {
 }
 endsnippet
 
+snippet jsonma "MarshalJSON" b
+func (v ${2:*}$1) MarshalJSON() ([]byte, error) {
+    $0
+}
+endsnippet
+
 snippet sleep "time.Sleep" b
 time.Sleep($0)
 endsnippet
@@ -113,4 +120,75 @@ snippet trun "test t.Run()" b
 t.Run("${1:name}", func(t *testing.T) {
 	$0
 })
+endsnippet
+
+snippet deprecate "Mark as deprecated" b
+// Deprecated: ${1:Use ${2:XXX} instead}.
+endsnippet
+
+snippet wf "Write to file" b
+${4:err := }ioutil.WriteFile("${1:name}", ${2:data}, ${3:0600})
+endsnippet
+
+snippet erris "error equal"
+errors.Is(${3:err}, ${2:err${1:Name}})
+endsnippet
+
+snippet select "select" b
+select {
+case $1:
+    $0
+}
+endsnippet
+
+snippet bench "Benchmark" b
+func Benchmark${1:Name}(b *testing.B) {
+    $0
+}
+endsnippet
+
+snippet iferr "if err != nil" b
+if ${1:err != nil} {
+    $0
+}
+endsnippet
+
+snippet forinc "for i := 0; i++" b
+for i := 0; i < ${1:n}; i++ {
+    $0
+}
+endsnippet
+
+snippet ms "time.Millisecond"
+time.Millisecond
+endsnippet
+
+snippet lock "mutex lock" b
+${1:mutex}.Lock()
+$0
+$1.Unlock()
+endsnippet
+
+snippet rwlock "mutex rwlock" b
+${1:mutex}.RLock()
+$0
+$1.RUnlock()
+endsnippet
+
+snippet deferlock "defer lock" b
+${1:mutex}.Lock()
+defer $1.Unlock()
+
+$0
+endsnippet
+
+snippet deferrwlock "defer rwlock" b
+${1:mutex}.RLock()
+defer $1.RUnlock()
+
+$0
+endsnippet
+
+snippet gounsafe "Not goroutine safe" b
+// Not goroutine safe.
 endsnippet

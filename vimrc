@@ -73,7 +73,7 @@ set softtabstop=4                                  " number of spaces per tab in
 set shiftwidth=4                                   " number of spaces when indenting
 set list                                           " highlight whitespace
 set listchars=tab:│\ ,trail:•,extends:❯,precedes:❮
-set fillchars=vert:│,fold:\ 
+set fillchars=vert:│,fold:\ ,diff:\ 
 set shiftround
 set linebreak
 
@@ -107,8 +107,10 @@ set incsearch  " incremental searching
 set ignorecase " ignore case for searching
 set smartcase  " do case-sensitive if there's a capital letter
 
-set colorcolumn=80
-set signcolumn=yes
+if !&diff
+  set colorcolumn=80
+  set signcolumn=yes
+endif
 
 func! s:set_snippets_type()
   if &ft ==? 'neosnippet'
@@ -128,8 +130,10 @@ augroup myvimrc
   autocmd BufReadPost * try | exe 'normal! g`"' | catch /E19/ | endtry
   autocmd FileType css,less,javascript,json,html,puppet,yaml,jinja,vim,vue setlocal shiftwidth=2 tabstop=2 softtabstop=2
   autocmd FileType go setlocal noexpandtab nowrap
-  autocmd WinEnter,BufWinEnter * if &ft != '__margin__' | set cursorline | endif
-  autocmd WinLeave * if &ft != '__margin__' | set nocursorline | endif
+  if !&diff
+    autocmd WinEnter,BufWinEnter * if &ft != '__margin__' | set cursorline | endif
+    autocmd WinLeave * if &ft != '__margin__' | set nocursorline | endif
+  endif
 augroup END
 
 
@@ -529,6 +533,7 @@ hi ColorColumn  guibg=#0B0B0B
 hi CursorLine   guibg=#0B0B0B cterm=NONE
 hi VertSplit    guibg=#0B0B0B guifg=#414141 term=NONE cterm=NONE gui=NONE
 hi Signcolumn   guibg=#0B0B0B guifg=NONE
+hi FoldColumn   guibg=#0B0B0B guifg=#2b2b2b
 hi SpecialKey   guibg=#0B0B0B guifg=#212a2d
 
 hi Constant     guifg=#82976F
@@ -548,6 +553,7 @@ hi CursorLineNr guibg=#212121 guifg=#839496
 hi DiffAdd      guibg=#212121
 hi DiffChange   guibg=#212121
 hi DiffDelete   guibg=#212121
+hi DiffText     guibg=#902330
 hi Type         guifg=#A38D61
 hi Pmenu        cterm=NONE gui=NONE guibg=NONE guifg=#696C70
 hi PmenuSel     cterm=NONE gui=NONE guibg=#232323 guifg=NONE
