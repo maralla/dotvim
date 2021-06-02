@@ -574,6 +574,6 @@ ab todo TODO
 
 " Copy/paste fix
 if has('linux')
-  xmap <silent> <SPACE> y:call system('wl-copy -n', @")<CR>
+  xmap <silent> <SPACE> y:call system('xclip -selection clipboard', @")<CR>
   nmap <silent> <SPACE>p :let @"=system("wl-paste -n")<cr>p
 endif
