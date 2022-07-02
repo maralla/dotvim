@@ -116,6 +116,11 @@
 - 
   category: default
   local: false
+  name: "hashivim/vim-terraform"
+  opt: false
+- 
+  category: default
+  local: false
   name: "honza/vim-snippets"
   opt: false
 - 

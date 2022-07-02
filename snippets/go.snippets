@@ -92,6 +92,18 @@ func (v ${2:*}$1) MarshalJSON() ([]byte, error) {
 }
 endsnippet
 
+snippet yamlun "UnmarshalYAML" b
+func (v *$1) UnmarshalYAML(unmarshal func(interface{}) error) error {
+    $0
+}
+endsnippet
+
+snippet yamlma "MarshalYAML" b
+func (v ${2:*}$1) MarshalYAML() (interface{}, error) {
+    $0
+}
+endsnippet
+
 snippet sleep "time.Sleep" b
 time.Sleep($0)
 endsnippet

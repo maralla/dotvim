@@ -12,8 +12,8 @@ let g:validator_highlight_message = 1
 
 let g:validator_use_popup_window = 1
 
-hi ValidatorPopupColor guifg=#C51E1E
-hi ValidatorBorderColor guifg=#161616
+hi ValidatorPopupColor guifg=#C51E1E ctermfg=160
+hi ValidatorBorderColor guifg=#161616 ctermfg=233
 
 let g:validator_debug=0
 

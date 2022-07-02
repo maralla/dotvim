@@ -34,11 +34,10 @@ filetype plugin indent on
 syntax enable
 
 " set t_Co=256
-" set background=dark
-set termguicolors
-let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
-let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
-"colorscheme solarized8
+" set termguicolors
+" let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+" let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+colorscheme maral
 
 set timeoutlen=300                              " mapping timeout
 set ttimeoutlen=50                              " keycode timeout
@@ -239,7 +238,7 @@ nnoremap <space>f :call filefinder#create_prompt()<CR>
 
 augroup hunkstart
   autocmd!
-  autocmd VimEnter * call hunk#start()
+  autocmd VimEnter * call hunk#Start()
 augroup END
 
 "netrw
@@ -360,12 +359,12 @@ func! StatusBranch()
     return ''
   endif
   let branch = fugitive#head()
-  return empty(branch) ? '' : "   \uF020 " . branch
+  return empty(branch) ? '' : "   ץ " . branch
 endfunc
 
 func! StatusFilename()
   let name = expand('%:t')
-  let name = name !=# '' ? "\uf022 " . name : '[No Name]'
+  let name = name !=# '' ? " " . name : '[No Name]'
   if &ft ==# 'netrw'
     let name = '  netrw'
   endif
@@ -422,19 +421,29 @@ func! s:hi(item, bg, ...)
   elseif a:0 > 0
     let fg = a:1
   endif
-  let guifg = empty(fg) ? '' : ' guifg=' . fg
+
+  let [guifg, ctermfg] = ['', '']
+
+  if !empty(fg)
+    let guifg = ' guifg=' . fg[0]
+    let ctermfg = ' ctermfg=' . fg[1]
+  endif
+
+  let guibg = ' guibg=' . a:bg[0]
+  let ctermbg = ' ctermbg=' . a:bg[1]
+
   let extra = empty(extra) ? '' : ' ' . extra
-  exe 'hi ' . a:item . guifg . ' guibg=' . a:bg . extra
+  exe 'hi ' . a:item . guifg . ctermfg . guibg . ctermbg . extra
 endfunc
 
 
 let s:color = {
-      \ 'status_bg': '#131313',
-      \ 'status_fg': '#6D6D6D',
-      \ 'status_nc_bg': '#212121',
-      \ 'status_nc_fg': '#6b6b6b',
-      \ 'fname_modified': '#c38300',
-      \ 'fname_readonly': '#525252',
+      \ 'status_bg': ['#131313', 233],
+      \ 'status_fg': ['#6D6D6D', 242],
+      \ 'status_nc_bg': ['#212121', 234],
+      \ 'status_nc_fg': ['#6b6b6b', 242],
+      \ 'fname_modified': ['#c38300', 172],
+      \ 'fname_readonly': ['#525252', 239],
       \ }
 " if exists('$TMUX')
 "   let s:color = {
@@ -466,7 +475,7 @@ let s:status_ignored_types = ['unite', 'finder', '__margin__']
 
 func! s:set_highlight()
   call s:hi('StatusLine', s:color.status_bg, s:color.status_bg, 'term=NONE gui=NONE cterm=NONE')
-  call s:hi('StatusLineNC', s:color.status_bg, 'NONE', 'term=NONE gui=NONE cterm=NONE')
+  call s:hi('StatusLineNC', s:color.status_bg, ['NONE', 'NONE'], 'term=NONE gui=NONE cterm=NONE')
 
   if index(s:status_ignored_types, &ft) >= 0
     return
@@ -481,10 +490,10 @@ func! s:set_highlight()
   hi link StatusActiveTmux      StatusActiveMode
 
   call s:hi_filename()
-  call s:hi('StatusActiveValidator', s:color.status_bg, '#C62828')
+  call s:hi('StatusActiveValidator', s:color.status_bg, ['#C62828', 160])
 
-  call s:hi('ValidatorErrorSign', s:color.status_bg, '#C62828', 'cterm=bold')
-  call s:hi('ValidatorWarningSign', s:color.status_bg, '#F9A825', 'cterm=bold')
+  call s:hi('ValidatorErrorSign', s:color.status_bg, ['#C62828', 160], 'cterm=bold')
+  call s:hi('ValidatorWarningSign', s:color.status_bg, ['#F9A825', 214], 'cterm=bold')
 endfunc
 call s:set_highlight()
 
@@ -524,53 +533,10 @@ augroup mystatusline "{{{
 augroup END "}}}
 
 
-" colorscheme {{{
-
-" hi Normal       guibg=#161616 guifg=#81848A
-" hi Normal       guibg=NONE guifg=#81848A
-hi Normal       guibg=NONE guifg=NONE
-hi ColorColumn  guibg=#0B0B0B
-hi CursorLine   guibg=#0B0B0B cterm=NONE
-hi VertSplit    guibg=#0B0B0B guifg=#414141 term=NONE cterm=NONE gui=NONE
-hi Signcolumn   guibg=#0B0B0B guifg=NONE
-hi FoldColumn   guibg=#0B0B0B guifg=#2b2b2b
-hi SpecialKey   guibg=#0B0B0B guifg=#212a2d
-
-hi Constant     guifg=#82976F
-hi Folded       guifg=#616161 guibg=NONE
-hi Statement    guifg=#5E81AC
-hi Search       guibg=#292E38 term=NONE cterm=bold gui=NONE guifg=NONE
-hi IncSearch    guibg=#292E38 term=NONE cterm=bold gui=NONE guifg=NONE
-hi Visual       guibg=#292E38 term=NONE cterm=NONE gui=NONE guifg=NONE
-hi Identifier   guifg=#81A1C1
-hi PreProc      guifg=#9E7D98
-hi Special      guifg=#B37460
-" hi Comment      guifg=#41495A gui=italic ctermfg=NONE ctermbg=NONE cterm=italic
-hi Comment      guifg=#62697B gui=italic ctermfg=NONE ctermbg=NONE cterm=italic
-hi MatchParen   gui=bold      guifg=#fdf6e3 guibg=NONE
-hi LineNr       guibg=#212121
-hi CursorLineNr guibg=#212121 guifg=#839496
-hi DiffAdd      guibg=#212121
-hi DiffChange   guibg=#212121
-hi DiffDelete   guibg=#212121
-hi DiffText     guibg=#902330
-hi Type         guifg=#A38D61
-hi Pmenu        cterm=NONE gui=NONE guibg=NONE guifg=#696C70
-hi PmenuSel     cterm=NONE gui=NONE guibg=#232323 guifg=NONE
-hi PmenuSbar    cterm=NONE gui=NONE guibg=#343638 guifg=NONE
-hi PmenuThumb   cterm=NONE gui=NONE guibg=#515457 guifg=NONE
-hi NonText      guifg=#464646 guibg=NONE
-hi ToDo         guifg=#892020 guibg=NONE gui=bold cterm=bold
-
-hi rustCommentLineDoc guifg=#714E41
-" ********************************}}}
-
-
 " ********************************
 " abbreviate
 ab todo TODO
 " ********************************
-
 
 " Copy/paste fix
 if has('linux')

@@ -133,15 +133,15 @@ func s:rg_fmt(item)
 endfunc
 
 
-func s:gen_path(cwd, pattern)
+func s:gen_path(cwd, pattern, suffix)
   if a:pattern == ''
     return a:cwd
   endif
-  if a:pattern =~ '^/'
+  if a:suffix =~ '^/'
     return a:pattern
   endif
-  if a:pattern =~ '^c'
-    let remain = a:pattern[1:]
+  if a:suffix =~ '^c'
+    let remain = a:suffix[1:]
     let cwd = expand('%:p:h')
     if remain != ""
       let cwd = cwd . '/' . remain
@@ -156,7 +156,7 @@ func s:parse_args(args, filter)
   let project_path = s:find_git()
   if a:args[1] == 'g'
     let s:operation = 'rg'
-    let opts = #{cwd: s:gen_path(project_path, a:args[2:])}
+    let opts = #{cwd: s:gen_path(project_path, a:args[2:], a:args[2:])}
     let s:dir = opts.cwd
     let action = ['rg', '-i', '--json', '--max-count', s:max_count(), a:filter, opts.cwd]
     let cmd = [action, opts, function('s:rg_fmt')]
@@ -178,7 +178,7 @@ func s:parse_args(args, filter)
     else
       let sub = a:args[1:]
     endif
-    let dir = s:gen_path(project_path, sub)
+    let dir = s:gen_path(project_path, sub, a:args[1:])
     let cmd = s:gen_find_cmd(dir, options, a:filter)
   endif
   return cmd
@@ -248,13 +248,13 @@ endfunc
 
 
 func s:init_props()
-  hi default finderMatches guifg=#599BD9 cterm=bold
-  hi default finderCursorPosition guibg=#3A484C
-  hi default finderPrompt guibg=NONE
-  hi default finderPromptSplitter guifg=#2E393C guibg=#1C2325
-  hi default finderPromptBorder guifg=#404D4F guibg=NONE
-  hi default finderPath guifg=#AD2584
-  hi default finderLineNumber guifg=#217100
+  hi default finderMatches guifg=#599BD9 cterm=bold ctermfg=33
+  hi default finderCursorPosition guibg=#3A484C ctermbg=238
+  hi default finderPrompt guibg=NONE ctermbg=NONE
+  hi default finderPromptSplitter guifg=#2E393C guibg=#1C2325 ctermfg=237 ctermbg=234
+  hi default finderPromptBorder guifg=#404D4F guibg=NONE ctermfg=238 ctermbg=NONE
+  hi default finderPath guifg=#AD2584 ctermfg=126
+  hi default finderLineNumber guifg=#217100 ctermfg=22
 
   augroup filefinder
     autocmd!

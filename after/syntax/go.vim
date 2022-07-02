@@ -1,2 +1,2 @@
 syn region goGenerate start="\s*//go:generate" end="$"
-hi def goGenerate guifg=#70586B
+hi def goGenerate guifg=#70586B ctermfg=96
