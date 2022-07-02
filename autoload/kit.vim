@@ -1,10 +1,10 @@
 func kit#text() range
-  call s:echo()
+  call Echo()
 endfunc
 
-def s:echo(): void
-  let bak = @a
-  let text = ''
+def Echo(): void
+  const bak = @a
+  var text = ''
 
   try
     silent! normal! gv"ay
