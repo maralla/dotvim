@@ -49,7 +49,16 @@ let g:completor_filetype_map.javascript = {'ft': 'lsp', 'cmd': '/home/maralla/Wo
 let g:completor_filetype_map.go = {'ft': 'lsp', 'cmd': 'gopls'}
 " Enable lsp for rust by using rls
 " let g:completor_filetype_map.rust = {'ft': 'lsp', 'cmd': 'rls'}
-let g:completor_filetype_map.rust = {'ft': 'lsp', 'cmd': 'rust-analyzer'}
+let g:completor_filetype_map.rust = {
+      \   'ft': 'lsp',
+      \   'cmd': 'rust-analyzer',
+      \   'options': {
+      \     'format': {
+      \       'tabSize': 4,
+      \       'insertSpaces': v:true
+      \     }
+      \   }
+      \ }
 " Enable lsp for c by using clangd
 " let g:completor_filetype_map.c = {'ft': 'lsp', 'cmd': 'clangd-7'}
 let g:completor_filetype_map.c = {'ft': 'lsp', 'cmd': '/usr/local/bin/ccls'}
