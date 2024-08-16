@@ -154,11 +154,15 @@ endfunc
 
 func s:parse_args(args, filter)
   let project_path = s:find_git()
-  if a:args[1] == 'g'
+  if a:args[1] == 'g' || a:args[1] == 'gi'
     let s:operation = 'rg'
     let opts = #{cwd: s:gen_path(project_path, a:args[2:], a:args[2:])}
     let s:dir = opts.cwd
-    let action = ['rg', '-i', '--json', '--max-count', s:max_count(), a:filter, opts.cwd]
+    if a:args[1] == 'gi'
+      let action = ['rg', '-i', '--json', '--max-count', s:max_count(), a:filter, opts.cwd]
+    else
+      let action = ['rg', '--json', '--max-count', s:max_count(), a:filter, opts.cwd]
+    endif
     let cmd = [action, opts, function('s:rg_fmt')]
   elseif a:args[1] == 'e'
     let opts = #{data: s:eval(a:filter), disable_cursorline: v:true}

@@ -46,7 +46,7 @@ let g:completor_filetype_map = {}
 " let g:completor_filetype_map.javascript = {'ft': 'lsp', 'cmd': '/home/maralla/Workspace/tmp/node/node_modules/.bin/flow lsp'}
 let g:completor_filetype_map.javascript = {'ft': 'lsp', 'cmd': '/home/maralla/Workspace/tmp/node/node_modules/.bin/typescript-language-server --stdio'}
 " Enable lsp for go by using gopls
-let g:completor_filetype_map.go = {'ft': 'lsp', 'cmd': 'gopls'}
+let g:completor_filetype_map.go = {'ft': 'lsp', 'cmd': 'gopls -mode=stdio'}
 " Enable lsp for rust by using rls
 " let g:completor_filetype_map.rust = {'ft': 'lsp', 'cmd': 'rls'}
 let g:completor_filetype_map.rust = {

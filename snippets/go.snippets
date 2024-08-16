@@ -183,6 +183,12 @@ func Benchmark${1:Name}(b *testing.B) {
 }
 endsnippet
 
+snippet eg "Example" b
+func Example${1:Name}() {
+    $0
+}
+endsnippet
+
 snippet iferr "if err != nil" b
 if ${1:err != nil} {
     $0

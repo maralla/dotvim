@@ -129,6 +129,11 @@
   name: "hynek/vim-python-pep8-indent"
   opt: false
 - 
+  category: lang
+  local: false
+  name: imsnif/kdl.vim
+  opt: false
+- 
   category: default
   local: false
   name: "jiangmiao/auto-pairs"
