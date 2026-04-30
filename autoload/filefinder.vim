@@ -359,6 +359,10 @@ endfunc
 
 let s:action = ''
 func s:prompt_filter(id, key)
+  if a:key =~ '^\x80'
+    " Ignore internal Vim key codes (K_SPECIAL), e.g. stray sequences on WSL.
+    return 1
+  endif
   if s:prompt_stop_all(a:key)
     return 1
   endif
