@@ -160,15 +160,17 @@ call EnsureExists(&undodir)
 call EnsureExists(&backupdir)
 call EnsureExists(&directory)
 
-" Cursor shape config.
-if exists('$TMUX')
-  if has('linux')
-    let &t_SI = "\<ESC>[6 q"
-    let &t_EI = "\<ESC>[0 q"
-  else
-    let &t_SI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=1\x7\<Esc>\\"
-    let &t_EI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=0\x7\<Esc>\\"
-  endif
+" Cursor shape config. Branch on what the terminal understands, not on
+" where it runs: a verbatim pipe to a real terminal (sandal's guest
+" console) is an xterm-like terminal whatever the environment says.
+if index(['xterm', 'tmux', 'screen', 'st', 'kitty', 'alacritty', 'foot',
+      \   'wezterm', 'rxvt', 'ghostty', 'mintty'],
+      \  split($TERM, '-')[0]) >= 0
+  let &t_SI = "\<ESC>[6 q"
+  let &t_EI = "\<ESC>[0 q"
+elseif exists('$TMUX')
+  let &t_SI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=1\x7\<Esc>\\"
+  let &t_EI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=0\x7\<Esc>\\"
 else
   let &t_SI = "\<Esc>]50;CursorShape=1\x7"
   let &t_EI = "\<Esc>]50;CursorShape=0\x7"
